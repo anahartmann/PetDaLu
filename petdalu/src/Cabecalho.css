@@ -1,0 +1,29 @@
+#faixa {
+  background-color: #b7dda4;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#logo {
+  padding-left: 10px;
+}
+
+#itens {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.item:hover {
+  color: #02341c;
+}
+
+.item {
+  padding: 30px;
+
+  color: #068146;
+  text-decoration: none;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}

@@ -1,0 +1,8 @@
+#imagem-usuario {
+  height: 50px;
+  width: 50px;
+  border-radius: 30px;
+  border-color: black;
+  border-width: 3px;
+  border-style: solid;
+}

@@ -1,0 +1,25 @@
+#box-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.txt-login {
+  color: #068146;
+  text-decoration: none;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.itens-login {
+  padding-top: 20px;
+}
+
+#container-login {
+  border-color: #068146;
+  border-style: solid;
+  border-width: 2px;
+  padding: 30px;
+  border-radius: 3px;
+  align-content: center;
+}
