@@ -1,4 +1,7 @@
-#container-perfil {
+#container-criar-conta {
+  border-color: #068146;
+  border-style: solid;
+  border-width: 2px;
   padding: 30px;
   padding-top: 10px;
   border-radius: 3px;
@@ -6,6 +9,9 @@
 }
 
 #box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding-top: 50px;
   padding-bottom: 50px;
 }
@@ -16,7 +22,7 @@
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
-#botao-perfil {
+#botao-criar-conta {
   margin-top: 20px;
   align-self: flex-start;
 }

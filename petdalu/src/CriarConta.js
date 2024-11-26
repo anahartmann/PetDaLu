@@ -1,19 +1,19 @@
 import { TextField } from "@mui/material";
 import ImagemUsuario from "./ImagemUsuario";
-import "./Perfil.css";
+import "./CriarConta.css";
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Button } from "@mui/material";
 
-function Perfil() {
+function CriarConta() {
   return (
     <div id="box">
-      <Container id="container-perfil">
+      <Container id="container-criar-conta">
         <Row>
           <Col>
-            <h2 className="txt">Sua conta</h2>
+            <h2 className="txt">Crie sua conta</h2>
             <div>
               <ImagemUsuario></ImagemUsuario>
               <button>Escolher foto</button>
@@ -45,8 +45,8 @@ function Perfil() {
             <div>
               <TextField required variant="standard" label="CPF"></TextField>
             </div>
-            <Button variant="contained" color="success" id="botao-perfil">
-              Alterar
+            <Button variant="contained" color="success" id="botao-criar-conta">
+              Criar conta
             </Button>
           </Col>
         </Row>
@@ -55,4 +55,4 @@ function Perfil() {
   );
 }
 
-export default Perfil;
+export default CriarConta;

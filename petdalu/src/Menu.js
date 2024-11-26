@@ -1,11 +1,7 @@
-import './Menu.css';
-import React from 'react';
+import "./Menu.css";
+import React from "react";
 function Menu() {
-  return (
-    <div>
-      
-    </div>
-  );
+  return <div></div>;
 }
 
 export default Menu;

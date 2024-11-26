@@ -12,7 +12,7 @@ function Login() {
       <div>
         <Container id="container-login">
           <Row>
-            <p className="txt-login">Faça seu login</p>
+            <h2 className="txt-login">Faça seu login</h2>
           </Row>
           <Row className="itens-login">
             <TextField required label="Usuário"></TextField>
@@ -23,6 +23,9 @@ function Login() {
           <Row className="itens-login">
             <Button variant="contained" color="success">
               Login
+            </Button>
+            <Button variant="contained" color="primary" id="botao-criar-conta">
+              Criar conta
             </Button>
           </Row>
         </Container>

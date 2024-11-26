@@ -2,8 +2,9 @@ import "./Cabecalho.css";
 import React from "react";
 import Titulo from "./Titulo";
 import ImagemUsuario from "./ImagemUsuario";
+import { Box, Button } from "@mui/material";
 
-function Cabecalho() {
+function Cabecalho({ controlaClique }) {
   return (
     <div id="faixa">
       <div id="logo">
@@ -11,28 +12,77 @@ function Cabecalho() {
       </div>
 
       <div id="itens">
-        <a href="Agenda" className="item">
-          Pets
-        </a>
-        <a href="Agenda" className="item">
+        <Button
+          id="agenda"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
+          Agenda
+        </Button>
+        <Button
+          id="enderecos"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
           Endereços
-        </a>
-        <a href="Agenda" className="item">
+        </Button>
+        <Button
+          id="historico"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
           Histórico
-        </a>
-        <a href="Agenda" className="item">
+        </Button>
+        <Button
+          id="anotacoes"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
           Anotações
-        </a>
-        <a href="Agenda" className="item">
+        </Button>
+        <Button
+          id="financas"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
           Finanças
-        </a>
-        <a href="Agenda" className="item">
+        </Button>
+        <Button
+          id="tabelaprecos"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
           Tabela de Preços
-        </a>
+        </Button>
 
-        <a href="Usuario" className="item">
-          <ImagemUsuario></ImagemUsuario>
-        </a>
+        <Button
+          id="conta"
+          className="item"
+          variant="link"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
+          <ImagemUsuario />
+        </Button>
       </div>
     </div>
   );

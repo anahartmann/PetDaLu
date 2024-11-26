@@ -4,3 +4,11 @@ body {
 
   margin: 0;
 }
+
+#menu {
+  display: flex;
+
+  justify-content: center;
+  margin-left: 30px;
+  margin-right: 30px;
+}

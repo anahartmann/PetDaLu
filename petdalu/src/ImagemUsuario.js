@@ -3,7 +3,7 @@ import React from "react";
 function ImagemUsuario() {
   return (
     <div>
-      <img src="usuario.png" id="imagem-usuario"></img>
+      <img src="usuario.png" id="conta" className="imagem-usuario"></img>
     </div>
   );
 }
