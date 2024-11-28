@@ -32,16 +32,7 @@ function Cabecalho({ controlaClique }) {
         >
           Endereços
         </Button>
-        <Button
-          id="historico"
-          variant="link"
-          className="item"
-          onClick={(event) => {
-            controlaClique(event.target.id);
-          }}
-        >
-          Histórico
-        </Button>
+
         <Button
           id="anotacoes"
           variant="link"
@@ -71,6 +62,17 @@ function Cabecalho({ controlaClique }) {
           }}
         >
           Tabela de Preços
+        </Button>
+
+        <Button
+          id="animais"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
+          Animais
         </Button>
 
         <Button

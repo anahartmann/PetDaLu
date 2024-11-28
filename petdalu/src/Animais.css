@@ -1,0 +1,110 @@
+/* Container principal */
+#cont_ani {
+  border-color: #068146;
+  border-style: solid;
+  border-width: 2px;
+  padding: 30px;
+  margin: 70px;
+  border-radius: 3px;
+  background-color: #f9f9f9;
+}
+
+/* Cabeçalho do container */
+.row_ani {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Título do container */
+.txt_ani {
+  color: #068146;
+  text-decoration: none;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: large;
+}
+
+#mais {
+  color: #068146;
+}
+
+.item {
+  color: #068146;
+  text-transform: capitalize;
+  font-family: Arial, sans-serif;
+}
+
+.item:hover {
+  color: #02341c;
+}
+
+.row_Animal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  transition: background-color 0.3s;
+}
+
+.row_Animal:hover {
+  background-color: #f1f1f1;
+}
+
+.txt_Animal {
+  flex: 1;
+  color: #333;
+  font-family: Arial, sans-serif;
+  font-size: medium;
+  margin-right: 10px;
+}
+
+.actions button {
+  color: #068146;
+  background-color: transparent;
+  border: none;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.actions button:hover {
+  color: #02341c;
+  text-decoration: underline;
+}
+
+.MuiDialog-paper {
+  border: 2px solid #068146;
+  border-radius: 10px;
+}
+
+.MuiDialogTitle-root {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: large;
+  color: #068146;
+  border-bottom: 1px solid #ccc;
+}
+
+.MuiDialogContent-root {
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.MuiDialogActions-root .MuiButton-root {
+  color: #068146;
+  font-family: Arial, sans-serif;
+}
+
+.MuiDialogActions-root .MuiButton-root:hover {
+  color: #02341c;
+  background-color: #e9f5ee;
+}
+
+#especie,
+#porte,
+#comportamento,
+#sexo {
+  color: #068146;
+  font-family: Arial, sans-serif;
+}
