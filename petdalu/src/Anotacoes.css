@@ -1,0 +1,58 @@
+#cont_ano {
+  border-color: #068146;
+  border-style: solid;
+  border-width: 2px;
+  padding: 30px;
+  margin: 70px;
+  border-radius: 3px;
+}
+
+.row_ano {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.txt_ano {
+  color: #068146;
+  text-decoration: none;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: large;
+}
+
+#mais {
+  color: #068146;
+}
+
+.item {
+  color: #068146;
+}
+
+.item:hover {
+  color: #02341c;
+}
+
+.row_Anotacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.txt_Anotacao {
+  flex: 1;
+  color: #333;
+  font-family: Arial, sans-serif;
+  font-size: medium;
+  margin-right: 10px;
+}
+
+.actions button {
+  color: #068146;
+}
+
+.actions button:hover {
+  color: #02341c;
+}

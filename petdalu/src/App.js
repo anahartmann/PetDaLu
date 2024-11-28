@@ -121,7 +121,6 @@ function App() {
           {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
           {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
           {exibeHistorico ? <Historico></Historico> : <div> </div>}
-          {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
           {exibeFinancas ? <TabelaFinancas></TabelaFinancas> : <div> </div>}
           {exibeTabelaPreco ? <TabelaPrecos></TabelaPrecos> : <div> </div>}
           {exibeConta ? <Perfil></Perfil> : <div> </div>}
