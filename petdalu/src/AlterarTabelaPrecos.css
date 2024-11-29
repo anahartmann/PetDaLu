@@ -1,0 +1,21 @@
+.container-opcao {
+  display: inline-flex;
+  justify-content: end;
+  margin-left: 50px;
+}
+
+#container-lista {
+  display: flex;
+  justify-content: start;
+}
+
+#tudo {
+  display: inline-flex;
+}
+
+.titulo {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  margin: 10px;
+  margin-top: 20px;
+  color: #068146;
+}

@@ -137,11 +137,8 @@ function App() {
             <div> </div>
           )}
 
-          {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
-
           {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
           {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
-
           {exibeFinancas ? <TabelaFinancas></TabelaFinancas> : <div> </div>}
           {exibeTabelaPreco ? (
             <AlterarTabelaPrecos></AlterarTabelaPrecos>
