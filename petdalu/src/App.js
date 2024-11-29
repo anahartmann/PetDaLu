@@ -7,6 +7,7 @@ import "./App.css";
 import Login from "./Login";
 import Agenda from "./Agenda";
 import TabelaPrecos from "./TabelaPrecos";
+import AlterarTabelaPrecos from "./AlterarTabelaPrecos";
 import Perfil from "./Perfil";
 import CriarConta from "./CriarConta";
 import Anotacoes from "./Anotacoes";
@@ -17,7 +18,7 @@ import Animais from "./Animais";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [exibeAgenda, setExibeAgenda] = React.useState(false);
+  const [exibeAgenda, setExibeAgenda] = React.useState(true);
   const [exibeEndereco, setexibeEndereco] = React.useState(false);
   const [exibeAnotacoes, setexibeAnotacoes] = React.useState(false);
   const [exibeFinancas, setexibeFinancas] = React.useState(false);
@@ -135,11 +136,18 @@ function App() {
           ) : (
             <div> </div>
           )}
+
+          {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
+
           {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
           {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
 
           {exibeFinancas ? <TabelaFinancas></TabelaFinancas> : <div> </div>}
-          {exibeTabelaPreco ? <TabelaPrecos></TabelaPrecos> : <div> </div>}
+          {exibeTabelaPreco ? (
+            <AlterarTabelaPrecos></AlterarTabelaPrecos>
+          ) : (
+            <div> </div>
+          )}
           {exibeConta ? <Perfil></Perfil> : <div> </div>}
           {exibeAnimais ? <Animais></Animais> : <div></div>}
           {/*  </div>

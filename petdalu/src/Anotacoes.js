@@ -72,6 +72,18 @@ function Anotacoes() {
 
         {Anotacoes.map((Anotacao) => (
           <Row key={Anotacao.id} className="row_Anotacao">
+            {" "}
+            <Checkbox
+              checked={Anotacao.status === "feito"}
+              onChange={() => atualizarStatus(Anotacao.id)}
+              color="default"
+              sx={{
+                color: "#068146",
+                "&.Mui-checked": {
+                  color: "#068146",
+                },
+              }}
+            />
             <p className="txt_Anotacao">{Anotacao.texto}</p>
             <div className="actions">
               <Button
@@ -90,17 +102,6 @@ function Anotacoes() {
               >
                 Excluir
               </Button>
-              <Checkbox
-                checked={Anotacao.status === "feito"}
-                onChange={() => atualizarStatus(Anotacao.id)}
-                color="default"
-                sx={{
-                  color: "#068146",
-                  "&.Mui-checked": {
-                    color: "#068146",
-                  },
-                }}
-              />
             </div>
           </Row>
         ))}

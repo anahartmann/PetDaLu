@@ -54,7 +54,7 @@ function Cabecalho({ controlaClique }) {
           Finanças
         </Button>
         <Button
-          id="tabelaprecos"
+          id="tabelapreco"
           variant="link"
           className="item"
           onClick={(event) => {
