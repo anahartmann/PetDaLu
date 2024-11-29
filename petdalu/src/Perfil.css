@@ -1,22 +1,41 @@
 #container-perfil {
+  border-color: #068146;
+  border-style: solid;
+  border-width: 2px;
   padding: 30px;
-  padding-top: 10px;
-  border-radius: 3px;
-  align-content: center;
-}
-
-#box {
-  padding-top: 50px;
-  padding-bottom: 50px;
+  margin: 50px auto;
+  border-radius: 5px;
+  max-width: 600px;
+  background-color: #f9f9f9;
 }
 
 .txt {
   color: #068146;
-  text-decoration: none;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  margin-bottom: 20px;
 }
 
-#botao-perfil {
+.imagem-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.btn-escolher-foto {
+  color: #068146;
+  border-color: #068146;
+}
+
+.btn-escolher-foto:hover {
+  background-color: #068146;
+  color: #fff;
+}
+
+.btn-alterar {
   margin-top: 20px;
-  align-self: flex-start;
 }
