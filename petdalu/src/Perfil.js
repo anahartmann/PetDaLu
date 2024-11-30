@@ -7,7 +7,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-function Perfil() {
+function Perfil({ logout }) {
   const [nome, setNome] = useState("");
   const [endereco, setEndereco] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -94,6 +94,15 @@ function Perfil() {
               onClick={handleAlterar}
             >
               Alterar
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              className="btn-alterar"
+              onClick={logout}
+            >
+              Sair
             </Button>
           </Col>
         </Row>

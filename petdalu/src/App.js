@@ -13,11 +13,14 @@ import CriarConta from "./CriarConta";
 import Anotacoes from "./Anotacoes";
 import Enderecos from "./Enderecos";
 import TabelaFinancas from "./TabelaFinancas";
-
+import axios from "axios";
 import Animais from "./Animais";
 
+axios.defaults.baseURL = "http://localhost:3010/";
+axios.defaults.headers.common["Content-Type"] =
+  "application/json;charset=utf-8";
+
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [exibeAgenda, setExibeAgenda] = React.useState(true);
   const [exibeEndereco, setexibeEndereco] = React.useState(false);
   const [exibeAnotacoes, setexibeAnotacoes] = React.useState(false);
@@ -26,7 +29,9 @@ function App() {
   const [exibeConta, setexibeConta] = React.useState(false);
   const [exibeAnimais, setexibeAnimais] = React.useState(false);
 
-  // const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  //const navigate = useNavigate();
 
   React.useEffect(() => {
     // verifica se já está logado
@@ -36,13 +41,17 @@ function App() {
     }
   }, []);
 
+  // const handleLogin = () => {
+  // 	setIsLoggedIn(true);
+  // };
+
   const handleLogout = () => {
+    // Clear the token from localStorage
     localStorage.removeItem("token");
     setIsLoggedIn(false);
   };
 
   function controlaInterface(id) {
-    console.log(`Veio ${id}`);
     if (id === "agenda") {
       setExibeAgenda(true);
       setexibeEndereco(false);
@@ -127,30 +136,34 @@ function App() {
           </Col>
         </Row>
         <Row id="menu">
-          {/*  {isLoggedIn ? (
-            <div> */}
-          {exibeAgenda ? (
-            <div id="menu">
-              <TabelaPrecos></TabelaPrecos> <Agenda></Agenda>
+          {isLoggedIn ? (
+            <div>
+              {exibeAgenda ? (
+                <div id="menu">
+                  <TabelaPrecos></TabelaPrecos> <Agenda></Agenda>
+                </div>
+              ) : (
+                <div> </div>
+              )}
+
+              {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
+              {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
+              {exibeFinancas ? <TabelaFinancas></TabelaFinancas> : <div> </div>}
+              {exibeTabelaPreco ? (
+                <AlterarTabelaPrecos></AlterarTabelaPrecos>
+              ) : (
+                <div> </div>
+              )}
+              {exibeConta ? (
+                <Perfil logout={handleLogout}></Perfil>
+              ) : (
+                <div> </div>
+              )}
+              {exibeAnimais ? <Animais></Animais> : <div></div>}
             </div>
           ) : (
-            <div> </div>
+            <Login user={isLoggedIn} handleLogin={setIsLoggedIn} />
           )}
-
-          {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
-          {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
-          {exibeFinancas ? <TabelaFinancas></TabelaFinancas> : <div> </div>}
-          {exibeTabelaPreco ? (
-            <AlterarTabelaPrecos></AlterarTabelaPrecos>
-          ) : (
-            <div> </div>
-          )}
-          {exibeConta ? <Perfil></Perfil> : <div> </div>}
-          {exibeAnimais ? <Animais></Animais> : <div></div>}
-          {/*  </div>
-          ) : (
-            <Login></Login>
-          )} */}
         </Row>
       </Container>
     </div>
