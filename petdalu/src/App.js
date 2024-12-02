@@ -29,26 +29,20 @@ function App() {
   const [exibeConta, setexibeConta] = React.useState(false);
   const [exibeAnimais, setexibeAnimais] = React.useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
-  //const navigate = useNavigate();
-
-  React.useEffect(() => {
-    // verifica se já está logado
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
-
-  // const handleLogin = () => {
-  // 	setIsLoggedIn(true);
-  // };
+  // React.useEffect(() => {
+  //   // verifica se já está logado
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     setIsLoggedIn(true);
+  //   }
+  // }, []);
 
   const handleLogout = () => {
     // Clear the token from localStorage
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    // setIsLoggedIn(false);
   };
 
   function controlaInterface(id) {
@@ -136,34 +130,23 @@ function App() {
           </Col>
         </Row>
         <Row id="menu">
-          {isLoggedIn ? (
-            <div>
-              {exibeAgenda ? (
-                <div id="menu">
-                  <TabelaPrecos></TabelaPrecos> <Agenda></Agenda>
-                </div>
-              ) : (
-                <div> </div>
-              )}
+          {/* tirei o login*/}
+          <div>
+            {exibeAgenda && (
+              <div id="menu">
+                <TabelaPrecos />
+                <Agenda />
+              </div>
+            )}
 
-              {exibeAnotacoes ? <Anotacoes></Anotacoes> : <div> </div>}
-              {exibeEndereco ? <Enderecos></Enderecos> : <div> </div>}
-              {exibeFinancas ? <TabelaFinancas></TabelaFinancas> : <div> </div>}
-              {exibeTabelaPreco ? (
-                <AlterarTabelaPrecos></AlterarTabelaPrecos>
-              ) : (
-                <div> </div>
-              )}
-              {exibeConta ? (
-                <Perfil logout={handleLogout}></Perfil>
-              ) : (
-                <div> </div>
-              )}
-              {exibeAnimais ? <Animais></Animais> : <div></div>}
-            </div>
-          ) : (
-            <Login user={isLoggedIn} handleLogin={setIsLoggedIn} />
-          )}
+            {exibeAnotacoes && <Anotacoes />}
+            {exibeEndereco && <Enderecos />}
+            {exibeFinancas && <TabelaFinancas />}
+            {exibeTabelaPreco && <AlterarTabelaPrecos />}
+            {exibeConta && <Perfil logout={handleLogout} />}
+            {exibeAnimais && <Animais />}
+          </div>
+          {/* <Login user={isLoggedIn} handleLogin={setIsLoggedIn} /> */}
         </Row>
       </Container>
     </div>

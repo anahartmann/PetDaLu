@@ -1,6 +1,4 @@
 import { TextField, Button } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import ImagemUsuario from "./ImagemUsuario";
 import "./Perfil.css";
 import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
@@ -24,18 +22,6 @@ function Perfil({ logout }) {
         <Row>
           <Col>
             <h2 className="txt">Sua conta</h2>
-            <div className="imagem-container">
-              <ImagemUsuario />
-              <Button
-                variant="text"
-                size="small"
-                className="btn-icone-foto"
-                aria-label="Mudar foto"
-                sx={{ color: "#068146" }}
-              >
-                <EditIcon fontSize="small" />
-              </Button>
-            </div>
 
             <div className="form-group">
               <TextField
@@ -87,7 +73,7 @@ function Perfil({ logout }) {
             </div>
 
             <Button
-              variant="contained"
+              variant="text"
               color="success"
               fullWidth
               className="btn-alterar"
@@ -96,7 +82,7 @@ function Perfil({ logout }) {
               Alterar
             </Button>
             <Button
-              variant="contained"
+              variant="text"
               color="success"
               fullWidth
               className="btn-alterar"
