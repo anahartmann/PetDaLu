@@ -12,13 +12,20 @@ import {
   DialogTitle,
 } from "@mui/material";
 
+//formatar a data no formato brasileiro (so pra mostrar na tabela)
+const formatarDataBrasileira = (data) => {
+  if (!data) return "";
+  const partes = data.split("-");
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+};
+
 function TabelaFinancas() {
   const [clientes, setClientes] = useState([
     {
       id: 1,
       nomeCliente: "Ana",
       nomePet: "Pimenta",
-      dataServico: "11/09/2024",
+      dataServico: "2024-11-11",
       valor: 150,
       pago: true,
     },
@@ -26,7 +33,7 @@ function TabelaFinancas() {
       id: 2,
       nomeCliente: "Maria",
       nomePet: "Iris",
-      dataServico: "16/11/2014",
+      dataServico: "2024-11-16",
       valor: 100,
       pago: false,
     },
@@ -34,7 +41,7 @@ function TabelaFinancas() {
       id: 3,
       nomeCliente: "Alex",
       nomePet: "Café",
-      dataServico: "17/11/2024",
+      dataServico: "2024-11-17",
       valor: 200,
       pago: false,
     },
@@ -42,6 +49,9 @@ function TabelaFinancas() {
 
   const [openForm, setOpenForm] = useState(false);
   const [registroAtual, setRegistroAtual] = useState(null);
+
+  const [filtroPeriodo, setFiltroPeriodo] = useState({ inicio: "", fim: "" });
+  const [filtroPagamento, setFiltroPagamento] = useState("todos");
 
   const handleOpenForm = (registro) => {
     setRegistroAtual(registro);
@@ -67,12 +77,74 @@ function TabelaFinancas() {
     setRegistroAtual({ ...registroAtual, pago: e.target.checked });
   };
 
+  //filtrar os clientes
+  const filtrarClientes = () => {
+    return clientes.filter((cliente) => {
+      //filtrar por pagamento
+      if (filtroPagamento === "pendente" && cliente.pago) return false;
+      if (filtroPagamento === "pago" && !cliente.pago) return false;
+
+      //filtrar por periodo
+      if (
+        filtroPeriodo.inicio &&
+        new Date(cliente.dataServico) < new Date(filtroPeriodo.inicio)
+      ) {
+        return false;
+      }
+      if (
+        filtroPeriodo.fim &&
+        new Date(cliente.dataServico) > new Date(filtroPeriodo.fim)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  };
+
+  const clientesFiltrados = filtrarClientes();
+
   return (
     <div id="tabela-clientes">
       <Container id="cont_tabela">
         <Row className="row_tabela">
           <p className="txt_tabela">Clientes e Pagamentos</p>
         </Row>
+
+        {/* filtros */}
+        <div className="filtros">
+          <TextField
+            label="Data Início"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={filtroPeriodo.inicio}
+            onChange={(e) =>
+              setFiltroPeriodo({ ...filtroPeriodo, inicio: e.target.value })
+            }
+          />
+          <TextField
+            label="Data Fim"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={filtroPeriodo.fim}
+            onChange={(e) =>
+              setFiltroPeriodo({ ...filtroPeriodo, fim: e.target.value })
+            }
+          />
+          <TextField
+            select
+            label="Pagamento"
+            SelectProps={{ native: true }}
+            value={filtroPagamento}
+            onChange={(e) => setFiltroPagamento(e.target.value)}
+          >
+            <option value="todos">Todos</option>
+            <option value="pago">Pago</option>
+            <option value="pendente">Pendente</option>
+          </TextField>
+        </div>
+
+        {/* tabela */}
         <table className="clientes-tabela">
           <thead>
             <tr>
@@ -84,16 +156,16 @@ function TabelaFinancas() {
             </tr>
           </thead>
           <tbody>
-            {clientes.map((cliente) => (
+            {clientesFiltrados.map((cliente) => (
               <tr key={cliente.id}>
                 <td>{cliente.nomeCliente}</td>
                 <td>{cliente.nomePet}</td>
-                <td>{cliente.dataServico}</td>
+                <td>{formatarDataBrasileira(cliente.dataServico)}</td>
                 <td>R$ {cliente.valor}</td>
                 <td>
                   <Checkbox
                     checked={cliente.pago}
-                    onChange={() => handleOpenForm(cliente)} //aq abre o formularioo do check
+                    onChange={() => handleOpenForm(cliente)}
                     color="default"
                     sx={{
                       color: "#068146",
@@ -130,7 +202,11 @@ function TabelaFinancas() {
             <TextField
               margin="dense"
               label="Data do Serviço"
-              value={registroAtual ? registroAtual.dataServico : ""}
+              value={
+                registroAtual
+                  ? formatarDataBrasileira(registroAtual.dataServico)
+                  : ""
+              }
               fullWidth
               variant="outlined"
               disabled

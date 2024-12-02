@@ -15,6 +15,7 @@ import Enderecos from "./Enderecos";
 import TabelaFinancas from "./TabelaFinancas";
 import axios from "axios";
 import Animais from "./Animais";
+import CadastroHorarios from "./CadastroHorarios";
 
 axios.defaults.baseURL = "http://localhost:3010/";
 axios.defaults.headers.common["Content-Type"] =
@@ -28,16 +29,17 @@ function App() {
   const [exibeTabelaPreco, setexibeTabelaPreco] = React.useState(false);
   const [exibeConta, setexibeConta] = React.useState(false);
   const [exibeAnimais, setexibeAnimais] = React.useState(false);
+  const [exibeCadHorario, setexibeCadHorario] = React.useState(false);
 
-  // const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
-  // React.useEffect(() => {
-  //   // verifica se já está logado
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     setIsLoggedIn(true);
-  //   }
-  // }, []);
+  React.useEffect(() => {
+    // verifica se já está logado
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const handleLogout = () => {
     // Clear the token from localStorage
@@ -49,7 +51,7 @@ function App() {
     if (id === "agenda") {
       setExibeAgenda(true);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -58,7 +60,7 @@ function App() {
     } else if (id === "enderecos") {
       setExibeAgenda(false);
       setexibeEndereco(true);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -67,7 +69,7 @@ function App() {
     } else if (id === "historico") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -76,7 +78,7 @@ function App() {
     } else if (id === "anotacoes") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(true);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -85,7 +87,7 @@ function App() {
     } else if (id === "financas") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(true);
       setexibeTabelaPreco(false);
@@ -94,7 +96,7 @@ function App() {
     } else if (id === "tabelapreco") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(true);
@@ -103,7 +105,7 @@ function App() {
     } else if (id === "conta") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -112,12 +114,21 @@ function App() {
     } else if (id === "animais") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
       setexibeConta(false);
       setexibeAnimais(true);
+    } else if (id === "cadhorario") {
+      setExibeAgenda(false);
+      setexibeEndereco(false);
+      setexibeAnotacoes(false);
+      setexibeFinancas(false);
+      setexibeTabelaPreco(false);
+      setexibeConta(false);
+      setexibeAnimais(false);
+      setexibeCadHorario(true);
     }
   }
 
@@ -130,23 +141,26 @@ function App() {
           </Col>
         </Row>
         <Row id="menu">
-          {/* tirei o login*/}
-          <div>
-            {exibeAgenda && (
-              <div id="menu">
-                <TabelaPrecos />
-                <Agenda />
-              </div>
-            )}
+          {isLoggedIn ? (
+            <div>
+              {exibeAgenda && (
+                <div id="menu">
+                  <TabelaPrecos />
+                  <Agenda />
+                </div>
+              )}
 
-            {exibeAnotacoes && <Anotacoes />}
-            {exibeEndereco && <Enderecos />}
-            {exibeFinancas && <TabelaFinancas />}
-            {exibeTabelaPreco && <AlterarTabelaPrecos />}
-            {exibeConta && <Perfil logout={handleLogout} />}
-            {exibeAnimais && <Animais />}
-          </div>
-          {/* <Login user={isLoggedIn} handleLogin={setIsLoggedIn} /> */}
+              {exibeAnotacoes && <Anotacoes />}
+              {exibeEndereco && <Enderecos />}
+              {exibeFinancas && <TabelaFinancas />}
+              {exibeTabelaPreco && <AlterarTabelaPrecos />}
+              {exibeConta && <Perfil logout={handleLogout} />}
+              {exibeAnimais && <Animais />}
+              {exibeCadHorario && <CadastroHorarios />}
+            </div>
+          ) : (
+            <Login user={isLoggedIn} handleLogin={setIsLoggedIn} />
+          )}
         </Row>
       </Container>
     </div>

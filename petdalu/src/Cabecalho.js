@@ -76,6 +76,17 @@ function Cabecalho({ controlaClique }) {
         </Button>
 
         <Button
+          id="cadhorario"
+          variant="link"
+          className="item"
+          onClick={(event) => {
+            controlaClique(event.target.id);
+          }}
+        >
+          Cadastro Agenda
+        </Button>
+
+        <Button
           id="conta"
           className="item"
           variant="link"
