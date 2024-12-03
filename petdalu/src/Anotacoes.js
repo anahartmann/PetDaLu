@@ -2,7 +2,7 @@ import "./Anotacoes.css";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import AddIcon from "@mui/icons-material/Add";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -12,52 +12,147 @@ import {
   DialogTitle,
   Checkbox,
 } from "@mui/material";
+import axios from "axios";
 
 function Anotacoes() {
-  const [Anotacoes, setAnotacoes] = useState([
-    { id: 1, texto: "Comprar Shampoo", status: "a_ser_realizado" },
-    { id: 2, texto: "Amolar lâminas", status: "a_ser_realizado" },
-    { id: 3, texto: "Comprar lacinhos", status: "a_ser_realizado" },
-  ]);
+  const [Anotacoes, setAnotacoes] = useState([]);
 
+  // Função para buscar os endereços da API
+  async function buscarAnotacoes() {
+    try {
+      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const response = await axios.get("http://localhost:3010/anotacoes", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+        },
+      });
+      setAnotacoes(response.data); // Atualiza os dados no estado
+    } catch (error) {
+      console.error("Erro ao buscar endereços:", error);
+    }
+  }
+
+  // Faz a requisição quando o componente é montado
+  useEffect(() => {
+    buscarAnotacoes();
+  }, []);
+
+  // Estados para controlar o formulário de novo endereço
   const [openForm, setOpenForm] = useState(false);
-  const [novoAnotacao, setNovoAnotacao] = useState("");
+  const [andescr, setAndescr] = useState(""); // Estado para o número
+  const [feito, setFeito] = useState(""); // Estado para o logradouro
+  const [anid, setAnid] = useState(""); // Estado para a cidade
+  const [erroandescr, setErroAndescr] = useState(false);
+
+  const [openFormAlterar, setOpenFormAlterar] = useState(false);
 
   const handleOpenForm = () => setOpenForm(true);
   const handleCloseForm = () => {
     setOpenForm(false);
-    setNovoAnotacao("");
+    setAndescr("");
+    setFeito("");
+    setAnid("");
+    setErroAndescr(false);
   };
 
-  const adicionarAnotacao = () => {
-    if (novoAnotacao.trim()) {
-      setAnotacoes([
-        ...Anotacoes,
-        {
-          id: Anotacoes.length + 1,
-          texto: novoAnotacao,
-          status: "a_ser_realizado",
-        },
-      ]);
+  const handleOpenFormAlterar = async (anid, andescr, feito) => {
+    setOpenFormAlterar(true);
+
+    setAnid(anid);
+    setAndescr(andescr);
+    setFeito(feito);
+  };
+  const handleCloseFormAlterar = () => {
+    setOpenFormAlterar(false);
+    setAndescr("");
+    setFeito("");
+    setAnid("");
+    setErroAndescr(false);
+  };
+
+  const handleAdicionarAnotacao = async () => {
+    setErroAndescr(false);
+    if (andescr === "") {
+      setErroAndescr(true);
+      alert("Por favor preencha todos os campos");
+    } else {
+      adicionarAnotacao();
     }
-    handleCloseForm();
   };
 
-  const excluirAnotacao = (id) => {
-    setAnotacoes(Anotacoes.filter((Anotacao) => Anotacao.id !== id));
+  const handleCheck = async (feito) => {
+    console.log(feito);
+    if (feito === "s") {
+      setFeito("n");
+    } else {
+      setFeito("s");
+    }
   };
 
-  const atualizarStatus = (id) => {
-    setAnotacoes(
-      Anotacoes.map((Anotacao) =>
-        Anotacao.id === id
-          ? {
-              ...Anotacao,
-              status: Anotacao.status === "feito" ? "a_ser_realizado" : "feito",
-            }
-          : Anotacao
-      )
-    );
+  const handleAlterarAnotacao = async () => {
+    setErroAndescr(false);
+    if (andescr === "") {
+      setErroAndescr(true);
+      alert("Por favor preencha todos os campos");
+    } else {
+      alterarAnotacao();
+    }
+  };
+
+  const adicionarAnotacao = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:3010/criaranotacoes",
+        { andescr: andescr, feito: "n" }, // Dados do novo endereço
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarAnotacoes(); // Atualiza a lista de endereços
+      handleCloseForm();
+    } catch (error) {
+      console.error("Erro ao adicionar anotação:", error);
+    }
+  };
+
+  const alterarAnotacao = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:3010/alteraranotacoes",
+        { andescr: andescr, feito: feito, anid: anid },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarAnotacoes(); // Atualiza a lista de endereços
+      handleCloseFormAlterar();
+    } catch (error) {
+      console.error("Erro ao alterar anotação:", error);
+    }
+  };
+
+  const excluirAnotacao = async (anid) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:3010/excluiranotacoes`,
+        { anid: anid },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarAnotacoes();
+    } catch (error) {
+      console.error("Erro ao excluir anotações:", error);
+    }
   };
 
   return (
@@ -71,11 +166,16 @@ function Anotacoes() {
         </Row>
 
         {Anotacoes.map((Anotacao) => (
-          <Row key={Anotacao.id} className="row_Anotacao">
-            {" "}
+          <Row key={Anotacao.anid} className="row_Anotacao">
             <Checkbox
-              checked={Anotacao.status === "feito"}
-              onChange={() => atualizarStatus(Anotacao.id)}
+              checked={Anotacao.feito === "s"}
+              onClick={() =>
+                handleOpenFormAlterar(
+                  Anotacao.anid,
+                  Anotacao.andescr,
+                  Anotacao.feito
+                )
+              }
               color="default"
               sx={{
                 color: "#068146",
@@ -84,13 +184,19 @@ function Anotacoes() {
                 },
               }}
             />
-            <p className="txt_Anotacao">{Anotacao.texto}</p>
+            <p className="txt_Anotacao">{Anotacao.andescr}</p>
             <div className="actions">
               <Button
                 variant="text"
                 sx={{ color: "#068146" }}
                 size="small"
-                onClick={() => alert(`Alterar ${Anotacao.texto}`)}
+                onClick={() =>
+                  handleOpenFormAlterar(
+                    Anotacao.anid,
+                    Anotacao.andescr,
+                    Anotacao.feito
+                  )
+                }
               >
                 Alterar
               </Button>
@@ -98,7 +204,7 @@ function Anotacoes() {
                 variant="text"
                 sx={{ color: "#068146" }}
                 size="small"
-                onClick={() => excluirAnotacao(Anotacao.id)}
+                onClick={() => excluirAnotacao(Anotacao.anid)}
               >
                 Excluir
               </Button>
@@ -115,9 +221,12 @@ function Anotacoes() {
               label="Nova anotação"
               type="text"
               fullWidth
+              error={erroandescr}
               variant="outlined"
-              value={novoAnotacao}
-              onChange={(e) => setNovoAnotacao(e.target.value)}
+              value={andescr}
+              onChange={(event) => {
+                setAndescr(event.target.value);
+              }}
             />
           </DialogContent>
           <DialogActions>
@@ -132,10 +241,62 @@ function Anotacoes() {
             <Button
               variant="text"
               className="item"
-              onClick={adicionarAnotacao}
+              onClick={handleAdicionarAnotacao}
               sx={{ color: "#068146" }}
             >
               Adicionar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={openFormAlterar} onClose={handleCloseFormAlterar}>
+          <DialogTitle>Alterar anotação</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Alterar anotação"
+              type="text"
+              fullWidth
+              error={erroandescr}
+              variant="outlined"
+              value={andescr}
+              onChange={(event) => {
+                setAndescr(event.target.value);
+              }}
+            />
+            <div className="checkbox-container">
+              <Checkbox
+                checked={feito === "s"}
+                onClick={() => handleCheck(feito)}
+                color="default"
+                sx={{
+                  color: "#068146",
+                  "&.Mui-checked": {
+                    color: "#068146",
+                  },
+                }}
+              ></Checkbox>
+
+              <label>Feito</label>
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="text"
+              className="item"
+              onClick={handleCloseFormAlterar}
+              sx={{ color: "#068146" }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="text"
+              className="item"
+              onClick={handleAlterarAnotacao}
+              sx={{ color: "#068146" }}
+            >
+              Alterar
             </Button>
           </DialogActions>
         </Dialog>

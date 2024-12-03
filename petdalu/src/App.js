@@ -9,7 +9,6 @@ import Agenda from "./Agenda";
 import TabelaPrecos from "./TabelaPrecos";
 import AlterarTabelaPrecos from "./AlterarTabelaPrecos";
 import Perfil from "./Perfil";
-import CriarConta from "./CriarConta";
 import Anotacoes from "./Anotacoes";
 import Enderecos from "./Enderecos";
 import TabelaFinancas from "./TabelaFinancas";
@@ -28,21 +27,51 @@ function App() {
   const [exibeTabelaPreco, setexibeTabelaPreco] = React.useState(false);
   const [exibeConta, setexibeConta] = React.useState(false);
   const [exibeAnimais, setexibeAnimais] = React.useState(false);
+  const [userRole, setUserRole] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
-  // const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+    isAdmin();
+  }, []);
 
-  // React.useEffect(() => {
-  //   // verifica se já está logado
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     setIsLoggedIn(true);
-  //   }
-  // }, []);
+  async function isAdmin() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3010/usuario", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.administrador === "s") {
+        setUserRole(true);
+      } else {
+        setUserRole(false);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar perfil:", error);
+    }
+  }
+
+  function handleLogin() {
+    setIsLoggedIn(true);
+    isAdmin();
+  }
+  // Faz a requisição quando o componente é montado
 
   const handleLogout = () => {
-    // Clear the token from localStorage
     localStorage.removeItem("token");
-    // setIsLoggedIn(false);
+    setIsLoggedIn(false);
+    setExibeAgenda(true);
+    setexibeEndereco(false);
+    setexibeAnotacoes(false);
+    setexibeFinancas(false);
+    setexibeTabelaPreco(false);
+    setexibeConta(false);
   };
 
   function controlaInterface(id) {
@@ -126,27 +155,33 @@ function App() {
       <Container>
         <Row>
           <Col>
-            <Cabecalho controlaClique={controlaInterface} />
+            <Cabecalho
+              controlaClique={controlaInterface}
+              userRole={userRole}
+              isLoggedIn={isLoggedIn}
+            />
           </Col>
         </Row>
         <Row id="menu">
-          {/* tirei o login*/}
-          <div>
-            {exibeAgenda && (
-              <div id="menu">
-                <TabelaPrecos />
-                <Agenda />
-              </div>
-            )}
+          {isLoggedIn ? (
+            <div>
+              {exibeAgenda && (
+                <div id="menu">
+                  <TabelaPrecos />
+                  <Agenda />
+                </div>
+              )}
 
-            {exibeAnotacoes && <Anotacoes />}
-            {exibeEndereco && <Enderecos />}
-            {exibeFinancas && <TabelaFinancas />}
-            {exibeTabelaPreco && <AlterarTabelaPrecos />}
-            {exibeConta && <Perfil logout={handleLogout} />}
-            {exibeAnimais && <Animais />}
-          </div>
-          {/* <Login user={isLoggedIn} handleLogin={setIsLoggedIn} /> */}
+              {exibeAnotacoes && <Anotacoes />}
+              {exibeEndereco && <Enderecos />}
+              {exibeFinancas && <TabelaFinancas />}
+              {exibeTabelaPreco && <AlterarTabelaPrecos />}
+              {exibeConta && <Perfil logout={handleLogout} />}
+              {exibeAnimais && <Animais userRole={userRole} />}
+            </div>
+          ) : (
+            <Login user={isLoggedIn} handleLogin={handleLogin} />
+          )}
         </Row>
       </Container>
     </div>

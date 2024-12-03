@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { Alert, Box, Button, Snackbar, Stack, TextField } from "@mui/material";
+import { Box, Button, Stack, TextField } from "@mui/material";
 import CriarConta from "./CriarConta";
 import "./Login.css";
 // import PropTypes from "prop-types";
@@ -10,49 +10,50 @@ import "./Login.css";
 export default function Login(props) {
   const [username, setUsername] = React.useState("");
   const [passwd, setPasswd] = React.useState("");
-  const [criarconta, setcriarconta] = React.useState(false);
   const [login, setlogin] = React.useState(true);
-  const [openMessage, setOpenMessage] = React.useState(false);
-  const [messageText, setMessageText] = React.useState("");
-  const [messageSeverity, setMessageSeverity] = React.useState("success");
+  const [erroUsername, setErroUsername] = React.useState(false);
+  const [erroPasswd, setErroPasswd] = React.useState(false);
 
-  async function enviaLogin(event) {
-    event.preventDefault();
+  async function enviaLogin() {
     try {
       const response = await axios.post("/login", {
         username: username,
         password: passwd,
       });
       if (response.status >= 200 && response.status < 300) {
-        // Salva o token JWT na sessão
         localStorage.setItem("token", response.data.token);
-        // seta o estado do login caso tudo deu certo
-        props.handleLogin(true);
+        props.handleLogin();
       } else {
-        // falha
         console.error("Falha na autenticação");
       }
     } catch (error) {
-      setOpenMessage(true);
-      setMessageText("Falha ao logar usuário!");
-      setMessageSeverity("error");
+      setErroPasswd(true);
+      setErroUsername(true);
+      alert("Email ou senha incorretos");
     }
-  }
-
-  function handleCloseMessage(_, reason) {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenMessage(false);
   }
 
   function handleCriarConta(id) {
     if (id === "criarconta") {
-      setcriarconta(true);
       setlogin(false);
     } else {
-      setcriarconta(false);
       setlogin(true);
+    }
+  }
+
+  function handleLogin() {
+    setErroUsername(false);
+    setErroPasswd(false);
+    if (username === "" || passwd === "") {
+      if (username === "") {
+        setErroUsername(true);
+      }
+      if (passwd === "") {
+        setErroPasswd(true);
+      }
+      alert("Por favor preencha todos os dados");
+    } else {
+      enviaLogin();
     }
   }
 
@@ -68,6 +69,7 @@ export default function Login(props) {
                 id="username-input"
                 label="Usuário"
                 size="small"
+                error={erroUsername}
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
               />
@@ -77,6 +79,7 @@ export default function Login(props) {
                 label="Senha"
                 type="password"
                 size="small"
+                error={erroPasswd}
                 value={passwd}
                 onChange={(event) => setPasswd(event.target.value)}
               />
@@ -90,7 +93,7 @@ export default function Login(props) {
                     backgroundColor: "rgba(6, 129, 70, 0.1)",
                   },
                 }}
-                onClick={enviaLogin}
+                onClick={handleLogin}
               >
                 Enviar
               </Button>
@@ -108,15 +111,6 @@ export default function Login(props) {
                 Criar conta
               </Button>
             </Stack>
-            <Snackbar
-              open={openMessage}
-              autoHideDuration={6000}
-              onClose={handleCloseMessage}
-            >
-              <Alert severity={messageSeverity} onClose={handleCloseMessage}>
-                {messageText}
-              </Alert>
-            </Snackbar>
           </Stack>
         ) : (
           <CriarConta handlecriarconta={handleCriarConta} />
@@ -125,7 +119,3 @@ export default function Login(props) {
     </div>
   );
 }
-
-// Login.propTypes = {
-// 	setToken: PropTypes.func.isRequired,
-// };

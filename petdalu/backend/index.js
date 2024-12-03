@@ -17,13 +17,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Sessão (modificado para desenvolvimento)
 app.use(
   session({
     secret: "alguma_frase_muito_doida_pra_servir_de_SECRET",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Alterado para false em desenvolvimento
+    cookie: { secure: true },
   })
 );
 app.use(passport.initialize());
@@ -132,15 +131,405 @@ app.post(
   }
 );
 
-// Rota protegida de exemplo
-app.get("/clientes", async (req, res) => {
+app.get("/clientes", requireJWTAuth, async (req, res) => {
   try {
-    const clientes = await db.any("SELECT * FROM pessoa;");
+    const clientes = await db.any("SELECT email, pnome FROM pessoa;");
     console.log("Retornando todos clientes.");
     res.json(clientes).status(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(400);
+  }
+});
+
+// Endereço -----------------------------------------------------------------
+app.get("/enderecos", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email; // Pega o email do usuário logado a partir do JWT
+    const enderecos = await db.any(
+      "SELECT eid, num, cidade, logradouro, email FROM endereco WHERE email = $1;",
+      [userEmail]
+    );
+
+    // Verifica se não há endereços
+    if (enderecos.length === 0) {
+      return res.status(404).json({ message: "Nenhum endereço encontrado." });
+    }
+
+    return res.status(200).json(enderecos);
+  } catch (error) {
+    console.error("Erro ao buscar endereços:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criarendereco", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const { num, logradouro, cidade } = req.body;
+
+    if (!num || !logradouro || !cidade) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(
+      "insert into endereco(num, cidade, logradouro, email) values ($1, $2, $3, $4);",
+      [parseInt(num), cidade, logradouro, userEmail]
+    );
+
+    console.log("Endereço criado com sucesso");
+    res.status(200).json({ message: "Endereço criado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar endereço:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluirendereco", requireJWTAuth, async (req, res) => {
+  try {
+    const { eid } = req.body;
+
+    await db.none("delete from endereco where eid =$1;", [eid]);
+
+    console.log("Endereço excluido com sucesso");
+    res.status(200).json({ message: "Endereço excluido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir endereço:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alterarendereco", requireJWTAuth, async (req, res) => {
+  try {
+    const { num, logradouro, cidade, eid } = req.body;
+    console.log(eid);
+    if (!num || !logradouro || !cidade || !eid) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(
+      "update endereco set num = $1, cidade = $2, logradouro = $3 where eid = $4",
+      [num, cidade, logradouro, eid]
+    );
+
+    console.log("Endereço alterado com sucesso");
+    res.status(200).json({ message: "Endereço alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar endereço:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Perfil ---------------------------------------------------------------------------------
+
+app.get("/perfil", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const perfil = await db.oneOrNone(
+      "SELECT email, pnome, cpf, telefone FROM pessoa WHERE email = $1;",
+      [userEmail]
+    );
+
+    if (!perfil) {
+      return res.status(404).json({ message: "Perfil não encontrado." });
+    }
+
+    console.log(perfil);
+    return res.status(200).json(perfil);
+  } catch (error) {
+    console.error("Erro ao buscar perfil:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alterarperfil", requireJWTAuth, async (req, res) => {
+  try {
+    const { telefone, pnome } = req.body;
+    const userEmail = req.user.email;
+
+    if (!telefone || !pnome) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(
+      "update pessoa set telefone = $1, pnome = $2 where email = $3;",
+      [telefone, pnome, userEmail]
+    );
+
+    console.log("Perfil alterado com sucesso");
+    res.status(200).json({ message: "Perfil alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar perfil:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Tabela de precos ----------------------------------------------------------------------
+
+app.get("/servico", requireJWTAuth, async (req, res) => {
+  try {
+    const servicos = await db.any("SELECT sid, preco, sdescr from servico;");
+    if (servicos.length === 0) {
+      return res.status(404).json({ message: "Nenhum serviço encontrado." });
+    }
+
+    return res.status(200).json(servicos);
+  } catch (error) {
+    console.error("Erro ao buscar serviços:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criarservico", requireJWTAuth, async (req, res) => {
+  try {
+    const { preco, sdescr } = req.body;
+
+    if (!preco || !sdescr) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(" insert into servico(preco, sdescr) values ($1, $2);", [
+      preco,
+      sdescr,
+    ]);
+
+    console.log("serviço criado com sucesso");
+    res.status(200).json({ message: "servico criado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar servico:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluirservico", requireJWTAuth, async (req, res) => {
+  try {
+    const { sid } = req.body;
+
+    await db.none("delete from servico where sid =$1;", [sid]);
+
+    console.log("servico excluido com sucesso");
+    res.status(200).json({ message: "servico excluido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir servico:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alterarservico", requireJWTAuth, async (req, res) => {
+  try {
+    const { sid, preco, sdescr } = req.body;
+
+    if (!preco || !sdescr || !sid) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none("update servico set preco = $1, sdescr = $2 where sid = $3", [
+      preco,
+      sdescr,
+      sid,
+    ]);
+
+    console.log("servico alterado com sucesso");
+    res.status(200).json({ message: "servico alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar servico:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Anotacoes -----------------------------------------------------------------
+app.get("/anotacoes", requireJWTAuth, async (req, res) => {
+  try {
+    const anotacoes = await db.any(
+      " select anid, andescr, feito from anotacoes;"
+    );
+
+    if (anotacoes.length === 0) {
+      return res.status(404).json({ message: "Nenhuma anotação encontrado." });
+    }
+
+    return res.status(200).json(anotacoes);
+  } catch (error) {
+    console.error("Erro ao buscar anotações:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criaranotacoes", requireJWTAuth, async (req, res) => {
+  try {
+    const { andescr, feito } = req.body;
+
+    if (!andescr || !feito) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none("insert into anotacoes(andescr, feito) values ($1, $2);", [
+      andescr,
+      feito,
+    ]);
+
+    console.log("Anotação criada com sucesso");
+    res.status(200).json({ message: "Anotação criada com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar endereço:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluiranotacoes", requireJWTAuth, async (req, res) => {
+  try {
+    const { anid } = req.body;
+
+    await db.none("delete from anotacoes where anid =$1;", [anid]);
+
+    console.log("Anotação excluido com sucesso");
+    res.status(200).json({ message: "Anotação excluido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir anotação:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alteraranotacoes", requireJWTAuth, async (req, res) => {
+  try {
+    const { andescr, feito, anid } = req.body;
+
+    if (!andescr || !feito || !anid) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(
+      "update anotacoes set andescr = $1, feito = $2 where anid = $3;",
+      [andescr, feito, anid]
+    );
+
+    console.log("Anotação alterado com sucesso");
+    res.status(200).json({ message: "Anotação alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar anotação:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Animal -----------------------------------------------------------------
+app.get("/animais", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email; // Pega o email do usuário logado a partir do JWT
+    const animais = await db.any(
+      "select aid, nome, especie, porte, comp, sexo, permissao from animal where email = $1;",
+      [userEmail]
+    );
+
+    if (animais.length === 0) {
+      return res.status(404).json({ message: "Nenhum animal encontrado." });
+    }
+
+    return res.status(200).json(animais);
+  } catch (error) {
+    console.error("Erro ao buscar animals:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criaranimal", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const { nome, especie, porte, comp, sexo, permissao, email } = req.body;
+
+    if (!nome || !especie || !porte || !comp || !sexo || !permissao) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    if (!email) {
+      await db.none(
+        "insert into animal(nome, especie, porte, comp, sexo, permissao, email) values ($1, $2, $3, $4, $5, $6, $7);",
+        [nome, especie, porte, comp, sexo, permissao, userEmail]
+      );
+    } else {
+      await db.none(
+        "insert into animal(nome, especie, porte, comp, sexo, permissao, email) values ($1, $2, $3, $4, $5, $6, $7);",
+        [nome, especie, porte, comp, sexo, permissao, email]
+      );
+    }
+
+    console.log("animal criado com sucesso");
+    res.status(200).json({ message: "animal criado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar animal:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluiranimal", requireJWTAuth, async (req, res) => {
+  try {
+    const { aid } = req.body;
+
+    await db.none("delete from animal where aid =$1;", [aid]);
+
+    console.log("animal excluido com sucesso");
+    res.status(200).json({ message: "animal excluido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir animal:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alteraranimal", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const { aid, nome, especie, porte, comp, sexo, permissao, email } =
+      req.body;
+
+    if (!aid || !nome || !especie || !porte || !comp || !sexo || !permissao) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+    if (!email) {
+      await db.none(
+        "update animal set nome = $1, especie = $2, porte = $3, comp = $4, sexo = $5, permissao = $6, email = $7 where aid = $8;",
+        [nome, especie, porte, comp, sexo, permissao, userEmail, aid]
+      );
+    } else {
+      await db.none(
+        "update animal set nome = $1, especie = $2, porte = $3, comp = $4, sexo = $5, permissao = $6, email = $7 where aid = $8;",
+        [nome, especie, porte, comp, sexo, permissao, email, aid]
+      );
+    }
+
+    console.log("animal alterado com sucesso");
+    res.status(200).json({ message: "animal alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar animal:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+//busca usuario
+app.get("/usuario", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const perfil = await db.oneOrNone(
+      "select administrador from pessoa WHERE email = $1;",
+      [userEmail]
+    );
+
+    if (!perfil) {
+      return res.status(404).json({ message: "Perfil não encontrado." });
+    }
+
+    console.log(perfil);
+    return res.status(200).json(perfil);
+  } catch (error) {
+    console.error("Erro ao buscar perfil:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
 
@@ -153,7 +542,8 @@ app.post("/novoUsuario", async (req, res) => {
     const { username, passwd, pnome, cpf, telefone, administrador } = req.body;
 
     // Validar se todos os campos obrigatórios foram enviados
-    if (!username || !passwd || !pnome || !cpf || !telefone) {
+    if (!username || !passwd || !pnome || !cpf || !telefone || !administrador) {
+      console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
 
@@ -173,7 +563,7 @@ app.post("/novoUsuario", async (req, res) => {
     // Inserir o novo usuário no banco
     await db.none(
       "INSERT INTO pessoa (email, pnome, senha, cpf, telefone, administrador) VALUES ($1, $2, $3, $4, $5, $6);",
-      [username, pnome, hashedPasswd, cpf, telefone, administrador || false] // `administrador` pode ser falso por padrão
+      [username, pnome, hashedPasswd, cpf, telefone, administrador]
     );
 
     console.log("Usuário inserido com sucesso");
