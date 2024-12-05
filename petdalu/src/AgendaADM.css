@@ -1,0 +1,94 @@
+.dia {
+  border: 2px;
+  border-left-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-color: black;
+  margin: 10px;
+
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+#semana {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.cabecalho-dia {
+  background-color: #b7dda4;
+  border: 2px;
+  border-color: black;
+  border-bottom-style: solid;
+  border-top-style: solid;
+  color: #068146;
+  padding: 10px;
+
+  text-align: center;
+}
+
+.horarios {
+  text-align: center;
+  color: aliceblue;
+  padding: 10px;
+}
+
+.horario-disponivel {
+  background-color: #068146;
+  border-radius: 30px;
+  padding: 10px;
+}
+
+.horario-disponivel:hover {
+  background-color: #02341c;
+  border-radius: 30px;
+}
+
+.horario-indisponivel {
+  background-color: #9dbd8d;
+  border-radius: 30px;
+  padding: 10px;
+}
+
+button {
+  background-color: #b7dda4;
+  border-radius: 10px;
+  border-style: none;
+  padding: 5px;
+  color: #068146;
+  margin-right: 10px;
+  margin-bottom: 20px;
+}
+
+.titulo {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  margin: 10px;
+  margin-top: 20px;
+  color: #068146;
+}
+
+#tabela {
+  border: 2px;
+  border-style: solid;
+  border-color: black;
+  margin: 10px;
+  margin-top: 20px;
+  padding: 10px;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.formulario {
+  padding: 10px;
+}
+
+.preco {
+  margin: 20px;
+  margin-left: 50px;
+}
+
+.preco-col {
+  align-self: end;
+  justify-self: end;
+}

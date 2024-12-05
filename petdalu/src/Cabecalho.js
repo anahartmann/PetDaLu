@@ -94,6 +94,16 @@ function Cabecalho({ controlaClique }) {
             controlaClique(event.target.id);
           }}
         >
+          <Button
+            id="agendaADM"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            AgendaADM
+          </Button>
           <ImagemUsuario />
         </Button>
       </div>
