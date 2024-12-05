@@ -1,0 +1,83 @@
+body,
+.txt_tabela,
+.clientes-tabela,
+.clientes-tabela th,
+.clientes-tabela td,
+.item {
+  font-family: sans-serif;
+}
+#cont_tabela {
+  border-color: #068146;
+  border-style: solid;
+  border-width: 2px;
+  padding: 30px;
+  margin: 70px;
+  border-radius: 3px;
+}
+
+.row_tabela {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.txt_tabela {
+  color: #068146;
+  text-decoration: none;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: large;
+}
+
+.clientes-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.clientes-tabela th,
+.clientes-tabela td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.clientes-tabela th {
+  background-color: #068146;
+  color: white;
+}
+
+.clientes-tabela tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.clientes-tabela tr:hover {
+  background-color: #f1f1f1;
+}
+
+.item {
+  color: #068146;
+}
+
+.item:hover {
+  color: #02341c;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.checkbox-container label {
+  margin-left: 8px;
+}
+
+.filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filtros > * {
+  flex: 1;
+}

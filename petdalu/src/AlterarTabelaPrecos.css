@@ -1,7 +1,7 @@
 .container-opcao {
   display: inline-flex;
   justify-content: end;
-  margin-left: 10px;
+  margin-left: 50px;
 }
 
 #container-lista {

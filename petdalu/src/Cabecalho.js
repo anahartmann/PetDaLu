@@ -98,6 +98,20 @@ function Cabecalho({ controlaClique, userRole, isLoggedIn }) {
         ) : (
           <div></div>
         )}
+        {!userRole && isLoggedIn ? (
+          <Button
+            id="historico"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Historico
+          </Button>
+        ) : (
+          <div></div>
+        )}
         <Button
           id="conta"
           className="item"

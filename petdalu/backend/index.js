@@ -345,7 +345,7 @@ app.get("/buscarservico", requireJWTAuth, async (req, res) => {
     }
 
     const servico = await db.oneOrNone(
-      "SELECT preco FROM servico WHERE porte = $1 AND sdescr = $2 LIMIT 1;",
+      "SELECT preco, sid FROM servico WHERE porte = $1 AND sdescr = $2 LIMIT 1;",
       [porte, sdescr]
     );
 
@@ -749,9 +749,29 @@ app.get("/agenda", async (req, res) => {
   }
 });
 
+app.get("/buscaragenda", requireJWTAuth, async (req, res) => {
+  try {
+    const { hora, data } = req.query; // Usar req.query para GET
+    if (!hora || !data) {
+      return res.status(400).json({ message: "Hora e data são obrigatórios." });
+    }
+
+    const agenda = await db.oneOrNone(
+      "SELECT pe.pnome as pnome, a.email as email, s.sdescr, g.met_pagamento AS met_pagamento, g.tipo_tosa AS tipo_tosa, g.preco_total AS preco, a.nome AS nomepet, a.especie AS especie,a.porte AS porte,a.comp AS comp,a.sexo AS sexo,a.permissao AS permissao,e1.logradouro AS logbusca,e1.num AS numbusca,e1.cidade AS cidadebusca, e2.logradouro AS logentrega, e2.num AS numentrega, e2.cidade AS cidadeentrega FROM agendamento g LEFT JOIN animal a ON g.aid = a.aid LEFT JOIN endereco e1 ON g.eid_busca = e1.eid LEFT JOIN endereco e2 ON g.eid_entrega = e2.eid natural left JOIN processo p natural left JOIN servico s join pessoa pe on pe.email = a.email WHERE g.ddata = $1 AND g.hhora = $2;",
+      [data, hora]
+    );
+    console.log(agenda);
+    return res.json(agenda);
+  } catch (error) {
+    console.error("Erro ao buscar agenda:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
 app.post("/criaragendamento", requireJWTAuth, async (req, res) => {
   try {
     const {
+      sid,
       ddata,
       hhora,
       pagamento,
@@ -764,6 +784,7 @@ app.post("/criaragendamento", requireJWTAuth, async (req, res) => {
     } = req.body;
 
     if (
+      !sid ||
       !ddata ||
       !hhora ||
       !pagamento ||
@@ -790,6 +811,11 @@ app.post("/criaragendamento", requireJWTAuth, async (req, res) => {
       ]
     );
 
+    await db.none(
+      "insert into processo(sid, ddata, hhora) values ($1, $2, $3);",
+      [sid, ddata, hhora]
+    );
+
     console.log("agendamento criado com sucesso");
     res.status(200).json({ message: "agendamento criado com sucesso." });
   } catch (error) {
@@ -800,7 +826,12 @@ app.post("/criaragendamento", requireJWTAuth, async (req, res) => {
 
 app.post("/excluiragendamento", requireJWTAuth, async (req, res) => {
   try {
-    const { ddata, hhroa } = req.body;
+    const { ddata, hhora } = req.body;
+
+    await db.none("delete from processo where hhora =$1 and ddata = $2;", [
+      hhora,
+      ddata,
+    ]);
 
     await db.none("delete from agendamento where hhora =$1 and ddata = $2;", [
       hhora,
@@ -811,6 +842,22 @@ app.post("/excluiragendamento", requireJWTAuth, async (req, res) => {
     res.status(200).json({ message: "agendamento excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir agendamento:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Finanças -----------------------------------------------------------------------------------------
+app.get("/historico", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const financas = await db.any(
+      "select h.hhora as hid, p.pnome as pnome, a.nome as anome, d.ddata as data, g.preco_total as preco, g.pagamento as pago from pessoa p join animal a on p.email = a.email join agendamento g on g.aid = a.aid join horarios h on h.hhora = g.hhora join data d on d.ddata = g.ddata where p.email = $1;",
+      [userEmail]
+    );
+    console.log(financas);
+    return res.status(200).json(financas);
+  } catch (error) {
+    console.error("Erro ao buscar historico:", error);
     return res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
