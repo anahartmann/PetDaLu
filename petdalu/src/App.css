@@ -7,8 +7,7 @@ body {
 
 #menu {
   display: flex;
-
-  justify-content: center;
+  justify-content: space-evenly;
   margin-left: 30px;
   margin-right: 30px;
 }

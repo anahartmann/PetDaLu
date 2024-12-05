@@ -151,11 +151,6 @@ app.get("/enderecos", requireJWTAuth, async (req, res) => {
       [userEmail]
     );
 
-    // Verifica se não há endereços
-    if (enderecos.length === 0) {
-      return res.status(404).json({ message: "Nenhum endereço encontrado." });
-    }
-
     return res.status(200).json(enderecos);
   } catch (error) {
     console.error("Erro ao buscar endereços:", error);
@@ -271,10 +266,9 @@ app.post("/alterarperfil", requireJWTAuth, async (req, res) => {
 
 app.get("/servico", requireJWTAuth, async (req, res) => {
   try {
-    const servicos = await db.any("SELECT sid, preco, sdescr from servico;");
-    if (servicos.length === 0) {
-      return res.status(404).json({ message: "Nenhum serviço encontrado." });
-    }
+    const servicos = await db.any(
+      "SELECT sid, preco, sdescr, porte from servico;"
+    );
 
     return res.status(200).json(servicos);
   } catch (error) {
@@ -285,17 +279,17 @@ app.get("/servico", requireJWTAuth, async (req, res) => {
 
 app.post("/criarservico", requireJWTAuth, async (req, res) => {
   try {
-    const { preco, sdescr } = req.body;
+    const { preco, sdescr, porte } = req.body;
 
     if (!preco || !sdescr) {
       console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
 
-    await db.none(" insert into servico(preco, sdescr) values ($1, $2);", [
-      preco,
-      sdescr,
-    ]);
+    await db.none(
+      " insert into servico(preco, sdescr, porte) values ($1, $2, $3);",
+      [preco, sdescr, porte]
+    );
 
     console.log("serviço criado com sucesso");
     res.status(200).json({ message: "servico criado com sucesso." });
@@ -321,23 +315,72 @@ app.post("/excluirservico", requireJWTAuth, async (req, res) => {
 
 app.post("/alterarservico", requireJWTAuth, async (req, res) => {
   try {
-    const { sid, preco, sdescr } = req.body;
+    const { sid, preco, sdescr, porte } = req.body;
 
     if (!preco || !sdescr || !sid) {
       console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
-
-    await db.none("update servico set preco = $1, sdescr = $2 where sid = $3", [
-      preco,
-      sdescr,
-      sid,
-    ]);
+    console.log(porte);
+    await db.none(
+      "update servico set preco = $1, sdescr = $2, porte = $3 where sid = $4",
+      [preco, sdescr, porte, sid]
+    );
 
     console.log("servico alterado com sucesso");
     res.status(200).json({ message: "servico alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar servico:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.get("/buscarservico", requireJWTAuth, async (req, res) => {
+  try {
+    const { sdescr, porte } = req.query; // Usar req.query para GET
+
+    if (!sdescr || !porte) {
+      console.log("Erro: Campos obrigatórios ausentes.");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    const servico = await db.oneOrNone(
+      "SELECT preco FROM servico WHERE porte = $1 AND sdescr = $2 LIMIT 1;",
+      [porte, sdescr]
+    );
+
+    if (!servico) {
+      return res.status(404).json({ message: "Serviço não encontrado." });
+    }
+
+    return res.status(200).json(servico);
+  } catch (error) {
+    console.error("Erro ao buscar serviço:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.get("/buscarporte", requireJWTAuth, async (req, res) => {
+  try {
+    const { aid } = req.query; // Usar req.query para GET
+
+    if (!aid) {
+      console.log("Erro: Campo 'aid' obrigatório.");
+      return res.status(400).json({ message: "Campo 'aid' é obrigatório." });
+    }
+
+    const porte = await db.oneOrNone(
+      "SELECT porte FROM animal WHERE aid = $1 LIMIT 1;",
+      [aid]
+    );
+
+    if (!porte) {
+      return res.status(404).json({ message: "Animal não encontrado." });
+    }
+
+    return res.status(200).json(porte);
+  } catch (error) {
+    console.error("Erro ao buscar porte:", error);
     return res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
@@ -348,10 +391,6 @@ app.get("/anotacoes", requireJWTAuth, async (req, res) => {
     const anotacoes = await db.any(
       " select anid, andescr, feito from anotacoes;"
     );
-
-    if (anotacoes.length === 0) {
-      return res.status(404).json({ message: "Nenhuma anotação encontrado." });
-    }
 
     return res.status(200).json(anotacoes);
   } catch (error) {
@@ -426,10 +465,6 @@ app.get("/animais", requireJWTAuth, async (req, res) => {
       "select aid, nome, especie, porte, comp, sexo, permissao from animal where email = $1;",
       [userEmail]
     );
-
-    if (animais.length === 0) {
-      return res.status(404).json({ message: "Nenhum animal encontrado." });
-    }
 
     return res.status(200).json(animais);
   } catch (error) {
@@ -508,6 +543,274 @@ app.post("/alteraranimal", requireJWTAuth, async (req, res) => {
     res.status(200).json({ message: "animal alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar animal:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Finanças -----------------------------------------------------------------------------------------
+app.get("/financas", requireJWTAuth, async (req, res) => {
+  try {
+    const financas = await db.any(
+      "select h.hhora as hid, p.pnome as pnome, a.nome as anome, d.ddata as data, g.preco_total as preco, g.pagamento as pago from pessoa p join animal a on p.email = a.email join agendamento g on g.aid = a.aid join horarios h on h.hhora = g.hhora join data d on d.ddata = g.ddata;"
+    );
+    console.log(financas);
+    return res.status(200).json(financas);
+  } catch (error) {
+    console.error("Erro ao buscar finanças:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alterarfinanca", requireJWTAuth, async (req, res) => {
+  try {
+    const { pago, hid, data } = req.body;
+
+    if (!pago || !hid || !data) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(
+      "update agendamento set pagamento = $1 where hhora = $2 and ddata = $3;",
+      [pago, hid, data]
+    );
+
+    console.log("Finança alterado com sucesso");
+    res.status(200).json({ message: "Finança alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar endereço:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Data -----------------------------------------------------------------
+app.get("/datas", requireJWTAuth, async (req, res) => {
+  try {
+    const datas = await db.any(
+      " select ddata as data, ddescr as descr from data order by ddata;"
+    );
+
+    return res.status(200).json(datas);
+  } catch (error) {
+    console.error("Erro ao buscar datas:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criardatas", requireJWTAuth, async (req, res) => {
+  try {
+    const { data, descr } = req.body;
+
+    if (!data || !descr) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none("insert into data(ddata, ddescr) values ($1, $2);", [
+      data,
+      descr,
+    ]);
+
+    console.log("data criada com sucesso");
+    res.status(200).json({ message: "data criada com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar data:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluirdatas", requireJWTAuth, async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    await db.none("delete from data where ddata = $1;", [data]);
+
+    console.log("data excluida com sucesso");
+    res.status(200).json({ message: "data excluida com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir data:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alterardatas", requireJWTAuth, async (req, res) => {
+  try {
+    const { data, descr, dataant } = req.body;
+
+    if (!data || !descr || !dataant) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none("update data set ddescr = $1, ddata = $2 where ddata = $3;", [
+      descr,
+      data,
+      dataant,
+    ]);
+
+    console.log("data alterada com sucesso");
+    res.status(200).json({ message: "data alterada com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar data:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Horarios -----------------------------------------------------------------
+app.get("/horarios", requireJWTAuth, async (req, res) => {
+  try {
+    const horarios = await db.any(
+      "select hhora as hora from horarios order by hhora;"
+    );
+
+    return res.status(200).json(horarios);
+  } catch (error) {
+    console.error("Erro ao buscar horarios:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criarhorarios", requireJWTAuth, async (req, res) => {
+  try {
+    const { horario } = req.body;
+
+    if (!horario) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none("insert into horarios(hhora) values ($1);", [horario]);
+
+    console.log("horario criado com sucesso");
+    res.status(200).json({ message: "horario criado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar horario:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluirhorarios", requireJWTAuth, async (req, res) => {
+  try {
+    const { horario } = req.body;
+
+    await db.none("delete from horarios where hhora =$1;", [horario]);
+
+    console.log("horario excluido com sucesso");
+    res.status(200).json({ message: "horario excluido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir horario:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/alterarhorarios", requireJWTAuth, async (req, res) => {
+  try {
+    const { horario, horarioant } = req.body;
+
+    if (!horario || !horarioant) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+    console.log(horario);
+    await db.none("update horarios set hhora = $1 where hhora = $2;", [
+      horario,
+      horarioant,
+    ]);
+
+    console.log("horario alterado com sucesso");
+    res.status(200).json({ message: "horario alterado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao alterar horarios:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+// Agenda -----------------------------------------------------------------
+app.get("/agenda", async (req, res) => {
+  try {
+    const { hora, data } = req.query; // Usar req.query para GET
+    if (!hora || !data) {
+      return res.status(400).json({ message: "Hora e data são obrigatórios." });
+    }
+
+    const agenda = await db.oneOrNone(
+      "SELECT ddata, hhora FROM agendamento WHERE ddata = $1 AND hhora = $2;",
+      [data, hora]
+    );
+
+    if (!agenda) {
+      return res.json({ disponivel: false });
+    }
+
+    return res.json({ disponivel: true });
+  } catch (error) {
+    console.error("Erro ao buscar agenda:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/criaragendamento", requireJWTAuth, async (req, res) => {
+  try {
+    const {
+      ddata,
+      hhora,
+      pagamento,
+      met_pagamento,
+      tipo_tosa,
+      preco_total,
+      aid,
+      eid_entrega,
+      eid_busca,
+    } = req.body;
+
+    if (
+      !ddata ||
+      !hhora ||
+      !pagamento ||
+      !met_pagamento ||
+      !preco_total ||
+      !aid
+    ) {
+      console.log("erro");
+      return res.status(400).json({ message: "Campos obrigatórios ausentes." });
+    }
+
+    await db.none(
+      "insert into agendamento( ddata, hhora, pagamento, met_pagamento, tipo_tosa, preco_total, aid, eid_entrega, eid_busca) values ($1, $2, $3, $4, $5, $6, $7, $8, $9);",
+      [
+        ddata,
+        hhora,
+        pagamento,
+        met_pagamento,
+        tipo_tosa,
+        preco_total,
+        aid,
+        eid_entrega,
+        eid_busca,
+      ]
+    );
+
+    console.log("agendamento criado com sucesso");
+    res.status(200).json({ message: "agendamento criado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao criar agendamento:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.post("/excluiragendamento", requireJWTAuth, async (req, res) => {
+  try {
+    const { ddata, hhroa } = req.body;
+
+    await db.none("delete from agendamento where hhora =$1 and ddata = $2;", [
+      hhora,
+      ddata,
+    ]);
+
+    console.log("agendamento excluido com sucesso");
+    res.status(200).json({ message: "agendamento excluido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao exluir agendamento:", error);
     return res.status(500).json({ message: "Erro interno do servidor." });
   }
 });

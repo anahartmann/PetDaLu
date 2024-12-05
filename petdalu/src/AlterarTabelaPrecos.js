@@ -12,8 +12,12 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-function AlterarTabelaPrecos() {
+import { FormControl, Select, MenuItem, InputLabel } from "@mui/material";
+
+function AlterarTabelaPrecos({ userRole }) {
   const [servicos, setServicos] = useState([]);
 
   async function buscarServicos() {
@@ -37,8 +41,10 @@ function AlterarTabelaPrecos() {
   const [openForm, setOpenForm] = useState(false);
   const [preco, setPreco] = useState("");
   const [sdescr, setSdescr] = useState("");
+  const [porte, setPorte] = useState("");
   const [erropreco, setErroPreco] = useState(false);
   const [errosdescr, setErroSdescr] = useState(false);
+  const [errosporte, setErroPorte] = useState(false);
   const [sid, setSid] = useState("");
   const [openFormAlterar, setOpenFormAlterar] = useState(false);
 
@@ -49,21 +55,26 @@ function AlterarTabelaPrecos() {
     setPreco("");
     setSdescr("");
     setSid("");
+    setPorte("");
+    setErroPorte(false);
     setErroPreco(false);
     setErroSdescr(false);
   };
 
-  const handleOpenFormAlterar = async (sid, preco, sdescr) => {
+  const handleOpenFormAlterar = async (sid, preco, sdescr, porte) => {
     setOpenFormAlterar(true);
     setPreco(preco);
     setSdescr(sdescr);
     setSid(sid);
+    setPorte(porte);
   };
   const handleCloseFormAlterar = () => {
     setOpenFormAlterar(false);
     setPreco("");
     setSdescr("");
     setSid("");
+    setPorte("");
+    setErroPorte(false);
     setErroPreco(false);
     setErroSdescr(false);
   };
@@ -71,15 +82,27 @@ function AlterarTabelaPrecos() {
   const adicionarServico = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:3010/criarservico",
-        { preco: preco, sdescr: sdescr },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (sdescr === "Entrega/Retirada") {
+        await axios.post(
+          "http://localhost:3010/criarservico",
+          { preco: preco, sdescr: sdescr, porte: "-" },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        await axios.post(
+          "http://localhost:3010/criarservico",
+          { preco: preco, sdescr: sdescr, porte: porte },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
       buscarServicos(); // Atualiza a lista de endereços
       handleCloseForm();
     } catch (error) {
@@ -90,15 +113,27 @@ function AlterarTabelaPrecos() {
   const alterarServico = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:3010/alterarservico",
-        { preco: preco, sdescr: sdescr, sid: sid },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (sdescr === "Entrega/Retirada") {
+        await axios.post(
+          "http://localhost:3010/alterarservico",
+          { preco: preco, sdescr: sdescr, sid: sid, porte: "-" },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        await axios.post(
+          "http://localhost:3010/alterarservico",
+          { preco: preco, sdescr: sdescr, sid: sid, porte: porte },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
       buscarServicos(); // Atualiza a lista de endereços
       handleCloseFormAlterar();
     } catch (error) {
@@ -127,13 +162,22 @@ function AlterarTabelaPrecos() {
   function handleadicionarServico() {
     setErroPreco(false);
     setErroSdescr(false);
-    if (sdescr === "" || preco === "") {
-      alert("Por favor preencha todos os campus");
+    setErroPorte(false);
+    if (
+      sdescr === "" ||
+      preco === "" ||
+      (sdescr !== "Entrega/Retirada" && porte === "")
+    ) {
+      alert("Por favor preencha todos os campos");
       if (sdescr === "") {
         setErroSdescr(true);
       }
       if (preco === "") {
         setErroPreco(true);
+      }
+
+      if (sdescr !== "Entrega/Retirada" && porte === "") {
+        setErroPorte(true);
       }
     } else if (isNaN(Number(preco))) {
       setErroPreco(true);
@@ -146,13 +190,22 @@ function AlterarTabelaPrecos() {
   function handlealterarServico() {
     setErroPreco(false);
     setErroSdescr(false);
-    if (sdescr === "" || preco === "") {
-      alert("Por favor preencha todos os campus");
+    setErroPorte(false);
+    if (
+      sdescr === "" ||
+      preco === "" ||
+      (sdescr !== "Entrega/Retirada" && porte === "")
+    ) {
+      alert("Por favor preencha todos os campos");
       if (sdescr === "") {
         setErroSdescr(true);
       }
       if (preco === "") {
         setErroPreco(true);
+      }
+
+      if (sdescr !== "Entrega/Retirada" && porte === "") {
+        setErroPorte(true);
       }
     } else if (isNaN(Number(preco))) {
       setErroPreco(true);
@@ -161,6 +214,9 @@ function AlterarTabelaPrecos() {
       alterarServico();
     }
   }
+
+  const tipodeservico = ["Banho", "Tosa", "Banho + Tosa", "Entrega/Retirada"];
+  const tipoPorte = ["Grande", "Médio", "Pequeno"];
 
   return (
     <div id="tabela-clientes">
@@ -179,41 +235,50 @@ function AlterarTabelaPrecos() {
           <thead>
             <tr>
               <th>Serviço</th>
+              <th>Porte</th>
               <th>Valor</th>
-              <th colSpan={2}>Ações</th>
+              {userRole ? <th colSpan={2}>Ações</th> : <div></div>}
             </tr>
           </thead>
           <tbody>
             {servicos.map((servico) => (
               <tr key={servico.sid}>
                 <td>{servico.sdescr}</td>
+                <td>{servico.porte}</td>
                 <td>R$ {servico.preco}</td>
-                <td>
-                  <Button
-                    variant="text"
-                    sx={{ color: "#068146" }}
-                    size="small"
-                    onClick={() =>
-                      handleOpenFormAlterar(
-                        servico.sid,
-                        servico.preco,
-                        servico.sdescr
-                      )
-                    }
-                  >
-                    Alterar
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="text"
-                    sx={{ color: "#068146" }}
-                    size="small"
-                    onClick={() => excluirServico(servico.sid)}
-                  >
-                    Excluir
-                  </Button>
-                </td>
+                {userRole ? (
+                  <div>
+                    <td>
+                      <Button
+                        variant="text"
+                        sx={{ color: "#068146" }}
+                        size="small"
+                        onClick={() =>
+                          handleOpenFormAlterar(
+                            servico.sid,
+                            servico.preco,
+                            servico.sdescr,
+                            servico.porte
+                          )
+                        }
+                      >
+                        <EditIcon></EditIcon>
+                      </Button>
+                    </td>
+                    <td>
+                      <Button
+                        variant="text"
+                        sx={{ color: "#068146" }}
+                        size="small"
+                        onClick={() => excluirServico(servico.sid)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </Button>
+                    </td>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
               </tr>
             ))}
           </tbody>
@@ -222,19 +287,44 @@ function AlterarTabelaPrecos() {
         <Dialog open={openForm} onClose={handleCloseForm}>
           <DialogTitle>Adicionar novo serviço</DialogTitle>
           <DialogContent>
-            <TextField
-              margin="dense"
-              label="Serviço"
-              name="descrServico"
-              value={sdescr}
-              error={errosdescr}
-              onChange={(event) => {
-                setSdescr(event.target.value);
-              }}
-              fullWidth
-              variant="outlined"
-            />
-
+            <FormControl fullWidth>
+              <InputLabel id="servico-label">
+                Selecione tipo de serviço
+              </InputLabel>
+              <Select
+                labelId="servico-label"
+                value={sdescr}
+                error={errosdescr}
+                onChange={(e) => setSdescr(e.target.value)}
+              >
+                {tipodeservico.map((tipo, index) => (
+                  <MenuItem key={index} value={tipo}>
+                    {tipo}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {sdescr !== "Entrega/Retirada" && sdescr !== "" ? (
+              <FormControl fullWidth>
+                <InputLabel id="porte-label">
+                  Selecione o porte do pet
+                </InputLabel>
+                <Select
+                  labelId="porte-label"
+                  value={porte}
+                  error={errosporte}
+                  onChange={(e) => setPorte(e.target.value)}
+                >
+                  {tipoPorte.map((tipo, index) => (
+                    <MenuItem key={index} value={tipo}>
+                      {tipo}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <div></div>
+            )}
             <TextField
               margin="dense"
               label="Valor"
@@ -269,18 +359,44 @@ function AlterarTabelaPrecos() {
         <Dialog open={openFormAlterar} onClose={handleCloseFormAlterar}>
           <DialogTitle>Alterar serviço</DialogTitle>
           <DialogContent>
-            <TextField
-              margin="dense"
-              label="Serviço"
-              name="descrServico"
-              error={errosdescr}
-              value={sdescr}
-              onChange={(event) => {
-                setSdescr(event.target.value);
-              }}
-              fullWidth
-              variant="outlined"
-            />
+            <FormControl fullWidth>
+              <InputLabel id="servico-label">
+                Selecione tipo de serviço
+              </InputLabel>
+              <Select
+                labelId="servico-label"
+                value={sdescr}
+                error={errosdescr}
+                onChange={(e) => setSdescr(e.target.value)}
+              >
+                {tipodeservico.map((tipo, index) => (
+                  <MenuItem key={index} value={tipo}>
+                    {tipo}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {sdescr !== "Entrega/Retirada" && sdescr !== "" ? (
+              <FormControl fullWidth>
+                <InputLabel id="porte-label">
+                  Selecione o porte do pet
+                </InputLabel>
+                <Select
+                  labelId="porte-label"
+                  value={porte}
+                  error={errosporte}
+                  onChange={(e) => setPorte(e.target.value)}
+                >
+                  {tipoPorte.map((tipo, index) => (
+                    <MenuItem key={index} value={tipo}>
+                      {tipo}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <div></div>
+            )}
 
             <TextField
               margin="dense"

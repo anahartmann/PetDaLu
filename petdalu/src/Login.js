@@ -22,7 +22,7 @@ export default function Login(props) {
       });
       if (response.status >= 200 && response.status < 300) {
         localStorage.setItem("token", response.data.token);
-        props.handleLogin();
+        props.handleLogin(true);
       } else {
         console.error("Falha na autenticação");
       }

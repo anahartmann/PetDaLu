@@ -71,3 +71,13 @@ body,
 .checkbox-container label {
   margin-left: 8px;
 }
+
+.filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filtros > * {
+  flex: 1;
+}

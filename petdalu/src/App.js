@@ -14,6 +14,7 @@ import Enderecos from "./Enderecos";
 import TabelaFinancas from "./TabelaFinancas";
 import axios from "axios";
 import Animais from "./Animais";
+import CadastroHorarios from "./CadastroHorarios";
 
 axios.defaults.baseURL = "http://localhost:3010/";
 axios.defaults.headers.common["Content-Type"] =
@@ -29,11 +30,14 @@ function App() {
   const [exibeAnimais, setexibeAnimais] = React.useState(false);
   const [userRole, setUserRole] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [exibeCadHorario, setexibeCadHorario] = React.useState(false);
 
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+    } else {
+      handleLogout();
     }
     isAdmin();
   }, []);
@@ -78,7 +82,7 @@ function App() {
     if (id === "agenda") {
       setExibeAgenda(true);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -87,7 +91,7 @@ function App() {
     } else if (id === "enderecos") {
       setExibeAgenda(false);
       setexibeEndereco(true);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -96,7 +100,7 @@ function App() {
     } else if (id === "historico") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -105,7 +109,7 @@ function App() {
     } else if (id === "anotacoes") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(true);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -114,7 +118,7 @@ function App() {
     } else if (id === "financas") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(true);
       setexibeTabelaPreco(false);
@@ -123,7 +127,7 @@ function App() {
     } else if (id === "tabelapreco") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(true);
@@ -132,7 +136,7 @@ function App() {
     } else if (id === "conta") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
@@ -141,12 +145,21 @@ function App() {
     } else if (id === "animais") {
       setExibeAgenda(false);
       setexibeEndereco(false);
-
+      setexibeCadHorario(false);
       setexibeAnotacoes(false);
       setexibeFinancas(false);
       setexibeTabelaPreco(false);
       setexibeConta(false);
       setexibeAnimais(true);
+    } else if (id === "cadhorario") {
+      setExibeAgenda(false);
+      setexibeEndereco(false);
+      setexibeAnotacoes(false);
+      setexibeFinancas(false);
+      setexibeTabelaPreco(false);
+      setexibeConta(false);
+      setexibeAnimais(false);
+      setexibeCadHorario(true);
     }
   }
 
@@ -167,7 +180,7 @@ function App() {
             <div>
               {exibeAgenda && (
                 <div id="menu">
-                  <TabelaPrecos />
+                  <AlterarTabelaPrecos userRole={userRole} />
                   <Agenda />
                 </div>
               )}
@@ -178,6 +191,7 @@ function App() {
               {exibeTabelaPreco && <AlterarTabelaPrecos />}
               {exibeConta && <Perfil logout={handleLogout} />}
               {exibeAnimais && <Animais userRole={userRole} />}
+              {exibeCadHorario && <CadastroHorarios />}
             </div>
           ) : (
             <Login user={isLoggedIn} handleLogin={handleLogin} />

@@ -60,7 +60,7 @@ function Cabecalho({ controlaClique, userRole, isLoggedIn }) {
         ) : (
           <div></div>
         )}
-        {userRole && isLoggedIn ? (
+        {/*   {userRole && isLoggedIn ? (
           <Button
             id="tabelapreco"
             variant="link"
@@ -73,7 +73,7 @@ function Cabecalho({ controlaClique, userRole, isLoggedIn }) {
           </Button>
         ) : (
           <div></div>
-        )}
+        )} */}
         <Button
           id="animais"
           variant="link"
@@ -84,7 +84,20 @@ function Cabecalho({ controlaClique, userRole, isLoggedIn }) {
         >
           Animais
         </Button>
-
+        {userRole && isLoggedIn ? (
+          <Button
+            id="cadhorario"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Cadastro Agenda
+          </Button>
+        ) : (
+          <div></div>
+        )}
         <Button
           id="conta"
           className="item"
