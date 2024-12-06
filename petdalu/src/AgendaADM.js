@@ -40,10 +40,10 @@ function AgendaADM({ userRole }) {
   const [diasDaSemana, setDiasDaSemana] = useState([]);
   const [horariosPorDia, setHorariosPorDia] = useState([]);
   const [somenteLeitura, setSomenteLeitura] = useState(false);
-  const [nome, setNome] = useState(""); // Estado para o nome
-  const [especie, setEspecie] = useState(""); // Estado para a espécie
-  const [comp, setComp] = useState(""); // Estado para o comportamento
-  const [sexo, setSexo] = useState(""); // Estado para o sexo
+  const [nome, setNome] = useState("");
+  const [especie, setEspecie] = useState("");
+  const [comp, setComp] = useState("");
+  const [sexo, setSexo] = useState("");
   const [permissao, setPermissao] = useState("n");
   const [sid, setSid] = useState("");
   const [exibeAgMarcado, setExibeAgMarcado] = useState(false);
@@ -115,15 +115,15 @@ function AgendaADM({ userRole }) {
 
   async function verDisponibilidade(data, hora) {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/agenda", {
         params: { data: data, hora: hora },
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      return response.data.disponivel; // Retorna true ou false
+      return response.data.disponivel;
     } catch (error) {
       console.error("Erro ao verificar disponibilidade:", error);
     }
@@ -177,7 +177,7 @@ function AgendaADM({ userRole }) {
           },
         }
       );
-      buscarhorarios(); // Atualiza a lista de datas
+      buscarhorarios();
       setExibeAgenda(true);
       setExibeAgendamento(false);
       setExibeAgMarcado(false);
@@ -196,24 +196,23 @@ function AgendaADM({ userRole }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      setPets(response.data); // Atualiza os dados no estado
+      setPets(response.data);
     } catch (error) {
       console.error("Erro ao buscar animais:", error);
     }
   }
 
-  const [enderecos, setEnderecos] = useState([]); // Armazena os endereços do banco
+  const [enderecos, setEnderecos] = useState([]);
 
-  // Função para buscar os endereços da API
   async function buscarEnderecos() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/enderecos", {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
-      setEnderecos(response.data); // Atualiza os dados no estado
+      setEnderecos(response.data);
     } catch (error) {
       console.error("Erro ao buscar endereços:", error);
     }
@@ -231,7 +230,7 @@ function AgendaADM({ userRole }) {
           },
         }
       );
-      buscarhorarios(); // Atualiza a lista de datas
+      buscarhorarios();
       setExibeAgenda(true);
       setExibeAgendamento(false);
       setExibeAgMarcado(false);
@@ -258,13 +257,13 @@ function AgendaADM({ userRole }) {
       setHorarioSelecionado(id);
       if (dadosAgendados && userRole) {
         try {
-          const token = localStorage.getItem("token"); // Recupera o token JWT
+          const token = localStorage.getItem("token");
           const response = await axios.get(
             "http://localhost:3010/buscaragenda",
             {
               params: { hora: hora, data: data },
               headers: {
-                Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -383,7 +382,7 @@ function AgendaADM({ userRole }) {
       }
     }
 
-    setValorTotal(total); // Define o valor total
+    setValorTotal(total);
   }
 
   function handleAgendar() {

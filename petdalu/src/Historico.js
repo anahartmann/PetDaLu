@@ -34,10 +34,10 @@ function Historico() {
   const [metodoPagamento, setMetodoPagamento] = useState("");
   const [hora, setHora] = useState("");
   const [porte, setPorte] = useState("");
-  const [nome, setNome] = useState(""); // Estado para o nome
-  const [especie, setEspecie] = useState(""); // Estado para a espécie
-  const [comp, setComp] = useState(""); // Estado para o comportamento
-  const [sexo, setSexo] = useState(""); // Estado para o sexo
+  const [nome, setNome] = useState("");
+  const [especie, setEspecie] = useState("");
+  const [comp, setComp] = useState("");
+  const [sexo, setSexo] = useState("");
   const [permissao, setPermissao] = useState("n");
   const [sid, setSid] = useState("");
   const [cidadeBusca, setCidadeBusca] = useState("");
@@ -62,13 +62,12 @@ function Historico() {
 
   const [clientes, setClientes] = useState([]);
 
-  //const [openForm, setOpenForm] = useState(false);
   const [registroAtual, setRegistroAtual] = useState(null);
 
   const [filtroPeriodo, setFiltroPeriodo] = useState({ inicio: "", fim: "" });
   const [filtroPagamento, setFiltroPagamento] = useState("todos");
 
-  const [financas, setfinancas] = useState([]); // Armazena os finanças do banco
+  const [financas, setfinancas] = useState([]);
 
   async function buscarfinancass() {
     try {
@@ -110,20 +109,20 @@ function Historico() {
 
   const [openForm, setOpenForm] = useState(false);
 
-  const [hid, setHid] = useState(""); // Estado para hid
-  const [pnome, setPnome] = useState(""); // Estado para pnome
-  const [anome, setAnome] = useState(""); // Estado para anome
-  const [data, setData] = useState(""); // Estado para data
-  const [pago, setPago] = useState(""); // Estado para pago
-  const [preco, setPreco] = useState(""); // Estado para preco
+  const [hid, setHid] = useState("");
+  const [pnome, setPnome] = useState("");
+  const [anome, setAnome] = useState("");
+  const [data, setData] = useState("");
+  const [pago, setPago] = useState("");
+  const [preco, setPreco] = useState("");
 
   const handleOpenForm = async (hora, data) => {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/buscaragenda", {
         params: { hora: hora, data: data },
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
       setHora(hora);
@@ -172,25 +171,22 @@ function Historico() {
     setOpenForm(false);
   };
 
-  //filtrar os clientes
   const filtrarClientes = () => {
     return financas.filter((cliente) => {
-      // Filtrar por pagamento
       if (filtroPagamento === "pendente" && cliente.pago === "s") return false;
       if (filtroPagamento === "pago" && cliente.pago === "n") return false;
 
-      // Filtrar por período
-      const dataServico = new Date(formatarData(cliente.data)); // Normaliza a data para comparação
+      const dataServico = new Date(formatarData(cliente.data));
 
       if (
         filtroPeriodo.inicio &&
-        new Date(formatarData(cliente.data)) < new Date(filtroPeriodo.inicio) // Comparação com a data inicial
+        new Date(formatarData(cliente.data)) < new Date(filtroPeriodo.inicio)
       ) {
         return false;
       }
       if (
         filtroPeriodo.fim &&
-        new Date(formatarData(cliente.data)) > new Date(filtroPeriodo.fim) // Comparação com a data final
+        new Date(formatarData(cliente.data)) > new Date(filtroPeriodo.fim)
       ) {
         return false;
       }

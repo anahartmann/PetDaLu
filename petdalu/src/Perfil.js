@@ -14,7 +14,6 @@ function Perfil({ logout }) {
   const [erroPnome, setErroPnome] = React.useState(false);
   const [erroTelefone, setErroTelefone] = React.useState(false);
 
-  // Função para buscar o perfil do usuário logado
   async function buscarPerfil() {
     try {
       const token = localStorage.getItem("token");

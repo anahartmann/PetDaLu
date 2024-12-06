@@ -14,33 +14,30 @@ import {
 } from "@mui/material";
 
 function Enderecos() {
-  const [enderecos, setEnderecos] = useState([]); // Armazena os endereços do banco
+  const [enderecos, setEnderecos] = useState([]);
 
-  // Função para buscar os endereços da API
   async function buscarEnderecos() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/enderecos", {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
-      setEnderecos(response.data); // Atualiza os dados no estado
+      setEnderecos(response.data);
     } catch (error) {
       console.error("Erro ao buscar endereços:", error);
     }
   }
 
-  // Faz a requisição quando o componente é montado
   useEffect(() => {
     buscarEnderecos();
   }, []);
 
-  // Estados para controlar o formulário de novo endereço
   const [openForm, setOpenForm] = useState(false);
-  const [num, setNum] = useState(""); // Estado para o número
-  const [logradouro, setLogradouro] = useState(""); // Estado para o logradouro
-  const [cidade, setCidade] = useState(""); // Estado para a cidade
+  const [num, setNum] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [cidade, setCidade] = useState("");
   const [errocidade, setErroCidade] = useState(false);
   const [erronum, setErroNum] = useState(false);
   const [errolog, setErroLog] = useState(false);
@@ -129,14 +126,14 @@ function Enderecos() {
       const token = localStorage.getItem("token");
       await axios.post(
         "http://localhost:3010/criarendereco",
-        { num: num, logradouro: logradouro, cidade: cidade }, // Dados do novo endereço
+        { num: num, logradouro: logradouro, cidade: cidade },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      buscarEnderecos(); // Atualiza a lista de endereços
+      buscarEnderecos();
       handleCloseForm();
     } catch (error) {
       console.error("Erro ao adicionar endereço:", error);
@@ -155,7 +152,7 @@ function Enderecos() {
           },
         }
       );
-      buscarEnderecos(); // Atualiza a lista de endereços
+      buscarEnderecos();
       handleCloseFormAlterar();
     } catch (error) {
       console.error("Erro ao alterar endereço:", error);

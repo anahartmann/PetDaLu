@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 
 function TabelaFinancas() {
-  //formatar a data no formato brasileiro (so pra mostrar na tabela)
   const formatarDataBrasileira = (data) => {
     if (!data) return "";
     const partes = data.split("-");
@@ -28,44 +27,39 @@ function TabelaFinancas() {
   };
 
   const [clientes, setClientes] = useState([]);
-
-  //const [openForm, setOpenForm] = useState(false);
   const [registroAtual, setRegistroAtual] = useState(null);
 
   const [filtroPeriodo, setFiltroPeriodo] = useState({ inicio: "", fim: "" });
   const [filtroPagamento, setFiltroPagamento] = useState("todos");
 
-  const [financas, setfinancas] = useState([]); // Armazena os finanças do banco
+  const [financas, setfinancas] = useState([]);
 
-  // Função para buscar os finanças da API
   async function buscarfinancass() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/financas", {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
-      setfinancas(response.data); // Atualiza os dados no estado
+      setfinancas(response.data);
     } catch (error) {
       console.error("Erro ao buscar finanças:", error);
     }
   }
 
-  // Faz a requisição quando o componente é montado
   useEffect(() => {
     buscarfinancass();
   }, []);
 
-  // Estados para controlar o formulário de novo endereço
   const [openForm, setOpenForm] = useState(false);
   const [openFormAlterar, setOpenFormAlterar] = useState(false);
-  const [hid, setHid] = useState(""); // Estado para hid
-  const [pnome, setPnome] = useState(""); // Estado para pnome
-  const [anome, setAnome] = useState(""); // Estado para anome
-  const [data, setData] = useState(""); // Estado para data
-  const [pago, setPago] = useState(""); // Estado para pago
-  const [preco, setPreco] = useState(""); // Estado para preco
+  const [hid, setHid] = useState("");
+  const [pnome, setPnome] = useState("");
+  const [anome, setAnome] = useState("");
+  const [data, setData] = useState("");
+  const [pago, setPago] = useState("");
+  const [preco, setPreco] = useState("");
 
   const handleOpenFormAlterar = async (
     hid,
@@ -106,7 +100,7 @@ function TabelaFinancas() {
           },
         }
       );
-      buscarfinancass(); // Atualiza a lista de finanças
+      buscarfinancass();
       handleCloseFormAlterar();
     } catch (error) {
       console.error("Erro ao alterar finança:", error);
@@ -121,25 +115,22 @@ function TabelaFinancas() {
     }
   };
 
-  //filtrar os clientes
   const filtrarClientes = () => {
     return financas.filter((cliente) => {
-      // Filtrar por pagamento
       if (filtroPagamento === "pendente" && cliente.pago === "s") return false;
       if (filtroPagamento === "pago" && cliente.pago === "n") return false;
 
-      // Filtrar por período
-      const dataServico = new Date(formatarData(cliente.data)); // Normaliza a data para comparação
+      const dataServico = new Date(formatarData(cliente.data));
 
       if (
         filtroPeriodo.inicio &&
-        new Date(formatarData(cliente.data)) < new Date(filtroPeriodo.inicio) // Comparação com a data inicial
+        new Date(formatarData(cliente.data)) < new Date(filtroPeriodo.inicio)
       ) {
         return false;
       }
       if (
         filtroPeriodo.fim &&
-        new Date(formatarData(cliente.data)) > new Date(filtroPeriodo.fim) // Comparação com a data final
+        new Date(formatarData(cliente.data)) > new Date(filtroPeriodo.fim)
       ) {
         return false;
       }

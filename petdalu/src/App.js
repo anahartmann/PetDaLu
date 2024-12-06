@@ -67,7 +67,6 @@ function App() {
     setIsLoggedIn(true);
     isAdmin();
   }
-  // Faz a requisição quando o componente é montado
 
   const handleLogout = () => {
     localStorage.removeItem("token");

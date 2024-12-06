@@ -7,16 +7,16 @@ import axios from "axios";
 import { Button, TextField } from "@mui/material";
 
 function CriarConta({ handlecriarconta }) {
-  const [username, setUsername] = React.useState(""); // email
-  const [passwd, setPasswd] = React.useState(""); // senha
-  const [pnome, setPnome] = React.useState(""); // primeiro nome
-  const [cpf, setCpf] = React.useState(""); // CPF
+  const [username, setUsername] = React.useState("");
+  const [passwd, setPasswd] = React.useState("");
+  const [pnome, setPnome] = React.useState("");
+  const [cpf, setCpf] = React.useState("");
   const [telefone, setTelefone] = React.useState("");
-  const [erroUsername, setErroUsername] = React.useState(false); // erro no email
-  const [erroPasswd, setErroPasswd] = React.useState(false); // erro na senha
-  const [erroPnome, setErroPnome] = React.useState(false); // erro no primeiro nome
-  const [erroCpf, setErroCpf] = React.useState(false); // erro no CPF
-  const [erroTelefone, setErroTelefone] = React.useState(false); // erro no telefone
+  const [erroUsername, setErroUsername] = React.useState(false);
+  const [erroPasswd, setErroPasswd] = React.useState(false);
+  const [erroPnome, setErroPnome] = React.useState(false);
+  const [erroCpf, setErroCpf] = React.useState(false);
+  const [erroTelefone, setErroTelefone] = React.useState(false);
 
   async function criaUsuario() {
     try {

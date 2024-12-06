@@ -3,9 +3,6 @@ import axios from "axios";
 import { Box, Button, Stack, TextField } from "@mui/material";
 import CriarConta from "./CriarConta";
 import "./Login.css";
-// import PropTypes from "prop-types";
-
-// const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
 export default function Login(props) {
   const [username, setUsername] = React.useState("");

@@ -17,31 +17,28 @@ import axios from "axios";
 function Anotacoes() {
   const [Anotacoes, setAnotacoes] = useState([]);
 
-  // Função para buscar os endereços da API
   async function buscarAnotacoes() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/anotacoes", {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
-      setAnotacoes(response.data); // Atualiza os dados no estado
+      setAnotacoes(response.data);
     } catch (error) {
       console.error("Erro ao buscar endereços:", error);
     }
   }
 
-  // Faz a requisição quando o componente é montado
   useEffect(() => {
     buscarAnotacoes();
   }, []);
 
-  // Estados para controlar o formulário de novo endereço
   const [openForm, setOpenForm] = useState(false);
-  const [andescr, setAndescr] = useState(""); // Estado para o número
-  const [feito, setFeito] = useState(""); // Estado para o logradouro
-  const [anid, setAnid] = useState(""); // Estado para a cidade
+  const [andescr, setAndescr] = useState("");
+  const [feito, setFeito] = useState("");
+  const [anid, setAnid] = useState("");
   const [erroandescr, setErroAndescr] = useState(false);
 
   const [openFormAlterar, setOpenFormAlterar] = useState(false);
@@ -104,14 +101,14 @@ function Anotacoes() {
       const token = localStorage.getItem("token");
       await axios.post(
         "http://localhost:3010/criaranotacoes",
-        { andescr: andescr, feito: "n" }, // Dados do novo endereço
+        { andescr: andescr, feito: "n" },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      buscarAnotacoes(); // Atualiza a lista de endereços
+      buscarAnotacoes();
       handleCloseForm();
     } catch (error) {
       console.error("Erro ao adicionar anotação:", error);
@@ -130,7 +127,7 @@ function Anotacoes() {
           },
         }
       );
-      buscarAnotacoes(); // Atualiza a lista de endereços
+      buscarAnotacoes();
       handleCloseFormAlterar();
     } catch (error) {
       console.error("Erro ao alterar anotação:", error);

@@ -20,10 +20,7 @@ import {
 import axios from "axios";
 
 function Animais({ userRole }) {
-  //onst [animais, setanimais] = useState([]);
-  //const [openForm, setOpenForm] = useState(false);
-
-  const [tutores, setTutores] = useState([]); // pegar do clientes
+  const [tutores, setTutores] = useState([]);
 
   async function buscarclientes() {
     try {
@@ -33,7 +30,7 @@ function Animais({ userRole }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      setTutores(response.data); // Atualiza os dados no estado
+      setTutores(response.data);
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
     }
@@ -49,33 +46,31 @@ function Animais({ userRole }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      setanimais(response.data); // Atualiza os dados no estado
+      setanimais(response.data);
     } catch (error) {
       console.error("Erro ao buscar animais:", error);
     }
   }
 
-  // Faz a requisição quando o componente é montado
   useEffect(() => {
     buscaranimais();
     buscarclientes();
   }, []);
 
-  // Estados para controlar o formulário de novo animal
   const [openForm, setOpenForm] = useState(false);
-  const [aid, setAid] = useState(""); // Estado para o aid
-  const [nome, setNome] = useState(""); // Estado para o nome
-  const [especie, setEspecie] = useState(""); // Estado para a espécie
-  const [porte, setPorte] = useState(""); // Estado para o porte
-  const [comp, setComp] = useState(""); // Estado para o comportamento
-  const [sexo, setSexo] = useState(""); // Estado para o sexo
-  const [permissao, setPermissao] = useState("n"); // Estado para a permissão
+  const [aid, setAid] = useState("");
+  const [nome, setNome] = useState("");
+  const [especie, setEspecie] = useState("");
+  const [porte, setPorte] = useState("");
+  const [comp, setComp] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [permissao, setPermissao] = useState("n");
   const [email, setEmail] = useState("");
-  const [erroNome, setErroNome] = useState(false); // Erro para o nome
-  const [erroEspecie, setErroEspecie] = useState(false); // Erro para a espécie
-  const [erroPorte, setErroPorte] = useState(false); // Erro para o porte
-  const [erroComp, setErroComp] = useState(false); // Erro para o comportamento
-  const [erroSexo, setErroSexo] = useState(false); // Erro para o sexo
+  const [erroNome, setErroNome] = useState(false);
+  const [erroEspecie, setErroEspecie] = useState(false);
+  const [erroPorte, setErroPorte] = useState(false);
+  const [erroComp, setErroComp] = useState(false);
+  const [erroSexo, setErroSexo] = useState(false);
 
   const [openFormAlterar, setOpenFormAlterar] = useState(false);
 
@@ -218,14 +213,14 @@ function Animais({ userRole }) {
           sexo: sexo,
           permissao: permissao,
           email: email,
-        }, // Dados do novo animal
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      buscaranimais(); // Atualiza a lista de animals
+      buscaranimais();
       handleCloseForm();
     } catch (error) {
       console.error("Erro ao adicionar animal:", error);
@@ -253,7 +248,7 @@ function Animais({ userRole }) {
           },
         }
       );
-      buscaranimais(); // Atualiza a lista de animals
+      buscaranimais();
       handleCloseFormAlterar();
     } catch (error) {
       console.error("Erro ao alterar animal:", error);

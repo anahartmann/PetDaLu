@@ -103,7 +103,7 @@ function AlterarTabelaPrecos({ userRole }) {
           }
         );
       }
-      buscarServicos(); // Atualiza a lista de endereços
+      buscarServicos();
       handleCloseForm();
     } catch (error) {
       console.error("Erro ao adicionar serviço:", error);
@@ -134,7 +134,7 @@ function AlterarTabelaPrecos({ userRole }) {
           }
         );
       }
-      buscarServicos(); // Atualiza a lista de endereços
+      buscarServicos();
       handleCloseFormAlterar();
     } catch (error) {
       console.error("Erro ao alterar serviço:", error);
@@ -153,7 +153,7 @@ function AlterarTabelaPrecos({ userRole }) {
           },
         }
       );
-      buscarServicos(); // Atualiza a lista de endereços
+      buscarServicos();
     } catch (error) {
       console.error("Erro ao excluir serviço:", error);
     }

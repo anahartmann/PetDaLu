@@ -19,25 +19,23 @@ function CadastroHorarios() {
 
   async function buscarhorarios() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/horarios", {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
-      setHorariosPorDia(response.data); // Atualiza os dados no estado
+      setHorariosPorDia(response.data);
     } catch (error) {
       console.error("Erro ao buscar horarios:", error);
     }
   }
 
-  // Faz a requisição quando o componente é montado
   useEffect(() => {
     buscarhorarios();
     buscardatas();
   }, []);
 
-  // Estados para controlar o formulário de novo endereço
   const [openFormHorario, setOpenFormHorario] = useState(false);
   const [hora, setHora] = useState("");
   const [horaant, setHoraAnt] = useState("");
@@ -95,14 +93,14 @@ function CadastroHorarios() {
       const token = localStorage.getItem("token");
       await axios.post(
         "http://localhost:3010/criarhorarios",
-        { horario: hora }, // Dados do novo endereço
+        { horario: hora },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      buscarhorarios(); // Atualiza a lista de horarios
+      buscarhorarios();
       handleCloseFormHorario();
     } catch (error) {
       console.error("Erro ao adicionar horario:", error);
@@ -121,7 +119,7 @@ function CadastroHorarios() {
           },
         }
       );
-      buscarhorarios(); // Atualiza a lista de horarios
+      buscarhorarios();
       handleCloseFormAlterarHorario();
     } catch (error) {
       console.error("Erro ao alterar horario:", error);
@@ -150,19 +148,18 @@ function CadastroHorarios() {
 
   async function buscardatas() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:3010/datas", {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token no cabeçalho
+          Authorization: `Bearer ${token}`,
         },
       });
-      setDiasDaSemana(response.data); // Atualiza os dados no estado
+      setDiasDaSemana(response.data);
     } catch (error) {
       console.error("Erro ao buscar datas:", error);
     }
   }
 
-  // Estados para controlar o formulário de novo endereço
   const [openFormData, setOpenFormData] = useState(false);
 
   const [openFormAlterarData, setOpenFormAlterarData] = useState(false);
@@ -231,14 +228,14 @@ function CadastroHorarios() {
       const token = localStorage.getItem("token");
       await axios.post(
         "http://localhost:3010/criardatas",
-        { data: dia, descr: descr }, // Dados do novo endereço
+        { data: dia, descr: descr },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      buscardatas(); // Atualiza a lista de datas
+      buscardatas();
       handleCloseFormData();
     } catch (error) {
       console.error("Erro ao adicionar Data:", error);
@@ -257,7 +254,7 @@ function CadastroHorarios() {
           },
         }
       );
-      buscardatas(); // Atualiza a lista de datas
+      buscardatas();
       handleCloseFormAlterarData();
     } catch (error) {
       console.error("Erro ao alterar Data:", error);
