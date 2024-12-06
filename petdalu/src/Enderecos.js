@@ -61,7 +61,7 @@ function Enderecos() {
 
   const handleOpenFormAlterar = async (eid, num, logradouro, cidade) => {
     setOpenFormAlterar(true);
-    console.log(eid);
+
     setEid(eid);
     setCidade(cidade);
     setNum(num);

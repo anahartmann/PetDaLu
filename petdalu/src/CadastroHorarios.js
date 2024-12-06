@@ -86,7 +86,6 @@ function CadastroHorarios() {
       seterroHora(true);
       alert("Por favor preencha todos os campos");
     } else {
-      console.log(hora);
       alterarHorario();
     }
   };

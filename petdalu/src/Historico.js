@@ -142,7 +142,7 @@ function Historico() {
       setCidadeEntrega(response.data.cidadeentrega);
       setLogEntrega(response.data.logentrega);
       setNumEntrega(response.data.numentrega);
-      console.log(cidadeBusca);
+
       setMetodoPagamento(response.data.met_pagamento);
       setPreco(response.data.preco);
       const bdomicilio =
@@ -181,11 +181,6 @@ function Historico() {
 
       // Filtrar por período
       const dataServico = new Date(formatarData(cliente.data)); // Normaliza a data para comparação
-      console.log(
-        new Date(filtroPeriodo.inicio),
-        new Date(filtroPeriodo.fim),
-        dataServico
-      );
 
       if (
         filtroPeriodo.inicio &&

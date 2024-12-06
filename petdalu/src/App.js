@@ -5,8 +5,6 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import "./App.css";
 import Login from "./Login";
-import Agenda from "./Agenda";
-import TabelaPrecos from "./TabelaPrecos";
 import AlterarTabelaPrecos from "./AlterarTabelaPrecos";
 import Perfil from "./Perfil";
 import Anotacoes from "./Anotacoes";

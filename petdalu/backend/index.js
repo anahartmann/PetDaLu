@@ -134,7 +134,7 @@ app.post(
 app.get("/clientes", requireJWTAuth, async (req, res) => {
   try {
     const clientes = await db.any("SELECT email, pnome FROM pessoa;");
-    console.log("Retornando todos clientes.");
+
     res.json(clientes).status(200);
   } catch (error) {
     console.log(error);
@@ -173,7 +173,6 @@ app.post("/criarendereco", requireJWTAuth, async (req, res) => {
       [parseInt(num), cidade, logradouro, userEmail]
     );
 
-    console.log("Endereço criado com sucesso");
     res.status(200).json({ message: "Endereço criado com sucesso." });
   } catch (error) {
     console.error("Erro ao criar endereço:", error);
@@ -187,7 +186,6 @@ app.post("/excluirendereco", requireJWTAuth, async (req, res) => {
 
     await db.none("delete from endereco where eid =$1;", [eid]);
 
-    console.log("Endereço excluido com sucesso");
     res.status(200).json({ message: "Endereço excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir endereço:", error);
@@ -198,7 +196,7 @@ app.post("/excluirendereco", requireJWTAuth, async (req, res) => {
 app.post("/alterarendereco", requireJWTAuth, async (req, res) => {
   try {
     const { num, logradouro, cidade, eid } = req.body;
-    console.log(eid);
+
     if (!num || !logradouro || !cidade || !eid) {
       console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
@@ -209,7 +207,6 @@ app.post("/alterarendereco", requireJWTAuth, async (req, res) => {
       [num, cidade, logradouro, eid]
     );
 
-    console.log("Endereço alterado com sucesso");
     res.status(200).json({ message: "Endereço alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar endereço:", error);
@@ -231,7 +228,6 @@ app.get("/perfil", requireJWTAuth, async (req, res) => {
       return res.status(404).json({ message: "Perfil não encontrado." });
     }
 
-    console.log(perfil);
     return res.status(200).json(perfil);
   } catch (error) {
     console.error("Erro ao buscar perfil:", error);
@@ -254,7 +250,6 @@ app.post("/alterarperfil", requireJWTAuth, async (req, res) => {
       [telefone, pnome, userEmail]
     );
 
-    console.log("Perfil alterado com sucesso");
     res.status(200).json({ message: "Perfil alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar perfil:", error);
@@ -291,7 +286,6 @@ app.post("/criarservico", requireJWTAuth, async (req, res) => {
       [preco, sdescr, porte]
     );
 
-    console.log("serviço criado com sucesso");
     res.status(200).json({ message: "servico criado com sucesso." });
   } catch (error) {
     console.error("Erro ao criar servico:", error);
@@ -305,7 +299,6 @@ app.post("/excluirservico", requireJWTAuth, async (req, res) => {
 
     await db.none("delete from servico where sid =$1;", [sid]);
 
-    console.log("servico excluido com sucesso");
     res.status(200).json({ message: "servico excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir servico:", error);
@@ -321,13 +314,12 @@ app.post("/alterarservico", requireJWTAuth, async (req, res) => {
       console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
-    console.log(porte);
+
     await db.none(
       "update servico set preco = $1, sdescr = $2, porte = $3 where sid = $4",
       [preco, sdescr, porte, sid]
     );
 
-    console.log("servico alterado com sucesso");
     res.status(200).json({ message: "servico alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar servico:", error);
@@ -340,7 +332,6 @@ app.get("/buscarservico", requireJWTAuth, async (req, res) => {
     const { sdescr, porte } = req.query; // Usar req.query para GET
 
     if (!sdescr || !porte) {
-      console.log("Erro: Campos obrigatórios ausentes.");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
 
@@ -365,7 +356,6 @@ app.get("/buscarporte", requireJWTAuth, async (req, res) => {
     const { aid } = req.query; // Usar req.query para GET
 
     if (!aid) {
-      console.log("Erro: Campo 'aid' obrigatório.");
       return res.status(400).json({ message: "Campo 'aid' é obrigatório." });
     }
 
@@ -404,7 +394,6 @@ app.post("/criaranotacoes", requireJWTAuth, async (req, res) => {
     const { andescr, feito } = req.body;
 
     if (!andescr || !feito) {
-      console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
 
@@ -413,7 +402,6 @@ app.post("/criaranotacoes", requireJWTAuth, async (req, res) => {
       feito,
     ]);
 
-    console.log("Anotação criada com sucesso");
     res.status(200).json({ message: "Anotação criada com sucesso." });
   } catch (error) {
     console.error("Erro ao criar endereço:", error);
@@ -427,7 +415,6 @@ app.post("/excluiranotacoes", requireJWTAuth, async (req, res) => {
 
     await db.none("delete from anotacoes where anid =$1;", [anid]);
 
-    console.log("Anotação excluido com sucesso");
     res.status(200).json({ message: "Anotação excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir anotação:", error);
@@ -449,7 +436,6 @@ app.post("/alteraranotacoes", requireJWTAuth, async (req, res) => {
       [andescr, feito, anid]
     );
 
-    console.log("Anotação alterado com sucesso");
     res.status(200).json({ message: "Anotação alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar anotação:", error);
@@ -495,7 +481,6 @@ app.post("/criaranimal", requireJWTAuth, async (req, res) => {
       );
     }
 
-    console.log("animal criado com sucesso");
     res.status(200).json({ message: "animal criado com sucesso." });
   } catch (error) {
     console.error("Erro ao criar animal:", error);
@@ -509,7 +494,6 @@ app.post("/excluiranimal", requireJWTAuth, async (req, res) => {
 
     await db.none("delete from animal where aid =$1;", [aid]);
 
-    console.log("animal excluido com sucesso");
     res.status(200).json({ message: "animal excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir animal:", error);
@@ -539,7 +523,6 @@ app.post("/alteraranimal", requireJWTAuth, async (req, res) => {
       );
     }
 
-    console.log("animal alterado com sucesso");
     res.status(200).json({ message: "animal alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar animal:", error);
@@ -553,7 +536,7 @@ app.get("/financas", requireJWTAuth, async (req, res) => {
     const financas = await db.any(
       "select h.hhora as hid, p.pnome as pnome, a.nome as anome, d.ddata as data, g.preco_total as preco, g.pagamento as pago from pessoa p join animal a on p.email = a.email join agendamento g on g.aid = a.aid join horarios h on h.hhora = g.hhora join data d on d.ddata = g.ddata;"
     );
-    console.log(financas);
+
     return res.status(200).json(financas);
   } catch (error) {
     console.error("Erro ao buscar finanças:", error);
@@ -575,7 +558,6 @@ app.post("/alterarfinanca", requireJWTAuth, async (req, res) => {
       [pago, hid, data]
     );
 
-    console.log("Finança alterado com sucesso");
     res.status(200).json({ message: "Finança alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar endereço:", error);
@@ -611,7 +593,6 @@ app.post("/criardatas", requireJWTAuth, async (req, res) => {
       descr,
     ]);
 
-    console.log("data criada com sucesso");
     res.status(200).json({ message: "data criada com sucesso." });
   } catch (error) {
     console.error("Erro ao criar data:", error);
@@ -625,7 +606,6 @@ app.post("/excluirdatas", requireJWTAuth, async (req, res) => {
 
     await db.none("delete from data where ddata = $1;", [data]);
 
-    console.log("data excluida com sucesso");
     res.status(200).json({ message: "data excluida com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir data:", error);
@@ -648,7 +628,6 @@ app.post("/alterardatas", requireJWTAuth, async (req, res) => {
       dataant,
     ]);
 
-    console.log("data alterada com sucesso");
     res.status(200).json({ message: "data alterada com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar data:", error);
@@ -681,7 +660,6 @@ app.post("/criarhorarios", requireJWTAuth, async (req, res) => {
 
     await db.none("insert into horarios(hhora) values ($1);", [horario]);
 
-    console.log("horario criado com sucesso");
     res.status(200).json({ message: "horario criado com sucesso." });
   } catch (error) {
     console.error("Erro ao criar horario:", error);
@@ -695,7 +673,6 @@ app.post("/excluirhorarios", requireJWTAuth, async (req, res) => {
 
     await db.none("delete from horarios where hhora =$1;", [horario]);
 
-    console.log("horario excluido com sucesso");
     res.status(200).json({ message: "horario excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir horario:", error);
@@ -711,13 +688,12 @@ app.post("/alterarhorarios", requireJWTAuth, async (req, res) => {
       console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
-    console.log(horario);
+
     await db.none("update horarios set hhora = $1 where hhora = $2;", [
       horario,
       horarioant,
     ]);
 
-    console.log("horario alterado com sucesso");
     res.status(200).json({ message: "horario alterado com sucesso." });
   } catch (error) {
     console.error("Erro ao alterar horarios:", error);
@@ -760,7 +736,7 @@ app.get("/buscaragenda", requireJWTAuth, async (req, res) => {
       "SELECT pe.pnome as pnome, a.email as email, s.sdescr, g.met_pagamento AS met_pagamento, g.tipo_tosa AS tipo_tosa, g.preco_total AS preco, a.nome AS nomepet, a.especie AS especie,a.porte AS porte,a.comp AS comp,a.sexo AS sexo,a.permissao AS permissao,e1.logradouro AS logbusca,e1.num AS numbusca,e1.cidade AS cidadebusca, e2.logradouro AS logentrega, e2.num AS numentrega, e2.cidade AS cidadeentrega FROM agendamento g LEFT JOIN animal a ON g.aid = a.aid LEFT JOIN endereco e1 ON g.eid_busca = e1.eid LEFT JOIN endereco e2 ON g.eid_entrega = e2.eid natural left JOIN processo p natural left JOIN servico s join pessoa pe on pe.email = a.email WHERE g.ddata = $1 AND g.hhora = $2;",
       [data, hora]
     );
-    console.log(agenda);
+
     return res.json(agenda);
   } catch (error) {
     console.error("Erro ao buscar agenda:", error);
@@ -816,7 +792,6 @@ app.post("/criaragendamento", requireJWTAuth, async (req, res) => {
       [sid, ddata, hhora]
     );
 
-    console.log("agendamento criado com sucesso");
     res.status(200).json({ message: "agendamento criado com sucesso." });
   } catch (error) {
     console.error("Erro ao criar agendamento:", error);
@@ -838,7 +813,6 @@ app.post("/excluiragendamento", requireJWTAuth, async (req, res) => {
       ddata,
     ]);
 
-    console.log("agendamento excluido com sucesso");
     res.status(200).json({ message: "agendamento excluido com sucesso" });
   } catch (error) {
     console.error("Erro ao exluir agendamento:", error);
@@ -846,7 +820,7 @@ app.post("/excluiragendamento", requireJWTAuth, async (req, res) => {
   }
 });
 
-// Finanças -----------------------------------------------------------------------------------------
+// Historico  -----------------------------------------------------------------------------------------
 app.get("/historico", requireJWTAuth, async (req, res) => {
   try {
     const userEmail = req.user.email;
@@ -854,10 +828,25 @@ app.get("/historico", requireJWTAuth, async (req, res) => {
       "select h.hhora as hid, p.pnome as pnome, a.nome as anome, d.ddata as data, g.preco_total as preco, g.pagamento as pago from pessoa p join animal a on p.email = a.email join agendamento g on g.aid = a.aid join horarios h on h.hhora = g.hhora join data d on d.ddata = g.ddata where p.email = $1;",
       [userEmail]
     );
-    console.log(financas);
+
     return res.status(200).json(financas);
   } catch (error) {
     console.error("Erro ao buscar historico:", error);
+    return res.status(500).json({ message: "Erro interno do servidor." });
+  }
+});
+
+app.get("/historicopago", requireJWTAuth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    const financas = await db.any(
+      "select g.hhora, g.ddata, g.pagamento as pago from pessoa p join animal a on p.email = a.email join agendamento g on g.aid = a.aid join horarios h on h.hhora = g.hhora join data d on d.ddata = g.ddata where p.email = $1;",
+      [userEmail]
+    );
+
+    return res.status(200).json(financas);
+  } catch (error) {
+    console.error("Erro ao buscar historico do pagamento:", error);
     return res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
@@ -875,7 +864,6 @@ app.get("/usuario", requireJWTAuth, async (req, res) => {
       return res.status(404).json({ message: "Perfil não encontrado." });
     }
 
-    console.log(perfil);
     return res.status(200).json(perfil);
   } catch (error) {
     console.error("Erro ao buscar perfil:", error);
@@ -893,7 +881,6 @@ app.post("/novoUsuario", async (req, res) => {
 
     // Validar se todos os campos obrigatórios foram enviados
     if (!username || !passwd || !pnome || !cpf || !telefone || !administrador) {
-      console.log("erro");
       return res.status(400).json({ message: "Campos obrigatórios ausentes." });
     }
 
@@ -916,10 +903,8 @@ app.post("/novoUsuario", async (req, res) => {
       [username, pnome, hashedPasswd, cpf, telefone, administrador]
     );
 
-    console.log("Usuário inserido com sucesso");
     res.status(200).json({ message: "Usuário criado com sucesso." });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erro ao criar o usuário." });
   }
 });
@@ -931,57 +916,3 @@ app.get("/", (req, res) => {
 
 // Inicialização do servidor
 app.listen(3010, () => console.log("Servidor rodando na porta 3010."));
-
-/* server.post("/senha", (req, res) => {
-  const nome = req.body.usuario;
-  const senha = req.body.senha;
-
-  res.send(`Usuario: ${nome} Senha: ${senha}`);
-});
-
-server.post("/data", (req, res) => {
-  const datas = ["12/10", "13/10", "14/10"];
-  const datadigitada = req.body.datadigitada;
-  switch (datadigitada) {
-    case datas[0]:
-      res.send(`Horarios disponiveis: 13:00, 14:30, 15:30, 17:00`);
-      break;
-    case datas[1]:
-      res.send(`Horarios disponiveis: 8:00, 11:30, 13:30, 15:00`);
-      break;
-    case datas[2]:
-      res.send(`Horarios disponiveis: 7:00, 8:00, 14:30, 16:00`);
-      break;
-    default:
-      res.send(`Nenhum horario/data disponivel`);
-      break;
-  }
-});
-
-server.post("/cadastro_animal", (req, res) => {
-  const nome = req.body.nome;
-  const especie = req.body.especie;
-  const porte = req.body.porte;
-  const comportamento = req.body.comportamento;
-  const permissao = req.body.permissao;
-
-  res.send(
-    `Nome: ${nome} <br> Especie: ${especie} <br>Porte: ${porte}  <br>Comportamento: ${comportamento}  <br>Permissao: ${permissao}`
-  );
-});
-
-server.post("/cadastro_usuario", (req, res) => {
-  const nome = req.body.nome;
-  const email = req.body.email;
-  const endereco = req.body.endereco;
-
-  let i = 0;
-
-  let primeiron = "";
-  while (nome[i] != " ") {
-    primeiron = primeiron.concat(nome[i]);
-    i++;
-  }
-
-  res.send(`Nome: ${primeiron} <br> Email: ${email} <br>Endereco: ${endereco}`);
-}); */

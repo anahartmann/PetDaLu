@@ -56,10 +56,11 @@ function AgendaADM({ userRole }) {
   const [numEntrega, setNumEntrega] = useState("");
   const [pnome, setPnome] = useState("");
   const [email, setEmail] = useState("");
+  const [ultimopago, setUltimoPago] = useState(false);
 
   async function buscarhorarios() {
     try {
-      const token = localStorage.getItem("token"); // Recupera o token JWT
+      const token = localStorage.getItem("token");
       const responseHorarios = await axios.get(
         "http://localhost:3010/horarios",
         {
@@ -92,7 +93,7 @@ function AgendaADM({ userRole }) {
 
           return {
             dia: dia.data,
-            horarios: indisponiveis.filter(Boolean), // Remove nulos
+            horarios: indisponiveis.filter(Boolean),
           };
         })
       );
@@ -107,9 +108,9 @@ function AgendaADM({ userRole }) {
 
   useEffect(() => {
     buscarhorarios();
-
     buscaranimais();
     buscarEnderecos();
+    buscarPagamento();
   }, []);
 
   async function verDisponibilidade(data, hora) {
@@ -125,6 +126,30 @@ function AgendaADM({ userRole }) {
       return response.data.disponivel; // Retorna true ou false
     } catch (error) {
       console.error("Erro ao verificar disponibilidade:", error);
+    }
+  }
+
+  async function buscarPagamento() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3010/historicopago", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const pagamentos = response.data;
+
+      const pagamentosNaoPagos = pagamentos.filter(
+        (pagamento) => pagamento.pago === "n"
+      );
+
+      if (pagamentosNaoPagos.length > 0) {
+        setUltimoPago(false);
+      } else {
+        setUltimoPago(true);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar pagamento:", error);
     }
   }
 
@@ -257,7 +282,7 @@ function AgendaADM({ userRole }) {
           setCidadeEntrega(response.data.cidadeentrega);
           setLogEntrega(response.data.logentrega);
           setNumEntrega(response.data.numentrega);
-          console.log(cidadeBusca);
+
           setMetodoPagamento(response.data.met_pagamento);
           setPreco(response.data.preco);
           const bdomicilio =
@@ -385,6 +410,14 @@ function AgendaADM({ userRole }) {
         setErroEnderecoEntrega(true);
       }
       alert("Por favor preencha todos os campos");
+    }
+    if (!ultimopago) {
+      alert("Você não pode agendar pois seu último agendamento não foi pago");
+      resetFormulario();
+      setSomenteLeitura(false);
+      setExibeAgMarcado(false);
+      setExibeAgenda(true);
+      setExibeAgendamento(false);
     } else {
       adicionarAgendamento();
     }

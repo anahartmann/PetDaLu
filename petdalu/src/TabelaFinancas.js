@@ -130,11 +130,6 @@ function TabelaFinancas() {
 
       // Filtrar por período
       const dataServico = new Date(formatarData(cliente.data)); // Normaliza a data para comparação
-      console.log(
-        new Date(filtroPeriodo.inicio),
-        new Date(filtroPeriodo.fim),
-        dataServico
-      );
 
       if (
         filtroPeriodo.inicio &&
@@ -208,7 +203,7 @@ function TabelaFinancas() {
           </thead>
           <tbody>
             {clientesFiltrados.map((cliente) => (
-              <tr key={cliente.hid}>
+              <tr key={`${cliente.hid} ${cliente.data}`}>
                 <td>{cliente.pnome}</td>
                 <td>{cliente.anome}</td>
                 <td>{formatarDataBrasileira(cliente.data)}</td>

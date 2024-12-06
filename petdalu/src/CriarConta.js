@@ -20,7 +20,6 @@ function CriarConta({ handlecriarconta }) {
 
   async function criaUsuario() {
     try {
-      //console.log(props.user);
       const response = await axios.post("/novoUsuario", {
         username: username,
         passwd: passwd,
@@ -35,7 +34,6 @@ function CriarConta({ handlecriarconta }) {
         console.error("Falha na autenticação");
       }
     } catch (error) {
-      console.log(error);
       alert("Email ou CPF já cadastrados");
       setErroCpf(true);
       setErroUsername(true);
