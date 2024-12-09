@@ -1,55 +1,111 @@
-import { TextField } from "@mui/material";
-import ImagemUsuario from "./ImagemUsuario";
 import "./CriarConta.css";
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Button } from "@mui/material";
 import axios from "axios";
+import { Button, TextField } from "@mui/material";
 
 function CriarConta({ handlecriarconta }) {
-  const [username, setUsername] = React.useState(""); // email
-  const [passwd, setPasswd] = React.useState(""); // senha
-  const [pnome, setPnome] = React.useState(""); // primeiro nome
-  const [cpf, setCpf] = React.useState(""); // CPF
-  const [telefone, setTelefone] = React.useState(""); // telefone
-  const [administrador, setAdministrador] = React.useState(false);
-  const [openMessage, setOpenMessage] = React.useState(false);
-  const [messageText, setMessageText] = React.useState("");
-  const [messageSeverity, setMessageSeverity] = React.useState("success");
+  const [username, setUsername] = React.useState("");
+  const [passwd, setPasswd] = React.useState("");
+  const [pnome, setPnome] = React.useState("");
+  const [cpf, setCpf] = React.useState("");
+  const [telefone, setTelefone] = React.useState("");
+  const [erroUsername, setErroUsername] = React.useState(false);
+  const [erroPasswd, setErroPasswd] = React.useState(false);
+  const [erroPnome, setErroPnome] = React.useState(false);
+  const [erroCpf, setErroCpf] = React.useState(false);
+  const [erroTelefone, setErroTelefone] = React.useState(false);
 
-  async function criaUsuario(event) {
-    event.preventDefault();
+  async function criaUsuario() {
     try {
-      //console.log(props.user);
       const response = await axios.post("/novoUsuario", {
         username: username,
         passwd: passwd,
         pnome: pnome,
         cpf: cpf,
         telefone: telefone,
-        administrador: administrador,
+        administrador: "n",
       });
       if (response.status >= 200 && response.status < 300) {
-        // Salva o token JWT na sessão
-        localStorage.setItem("token", response.data.token);
         handlecriarconta("certo");
-        setOpenMessage(true);
-        setMessageText("Usuario criado");
-        //setMessageSeverity("error");
-        // seta o estado do login caso tudo deu certo
-        // props.handleLogin(true);
-        //console.log(props.user);
       } else {
-        // falha
         console.error("Falha na autenticação");
       }
     } catch (error) {
-      console.log(error);
-      setOpenMessage(true);
-      setMessageText("Falha ao criar usuário!");
-      setMessageSeverity("error");
+      alert("Email ou CPF já cadastrados");
+      setErroCpf(true);
+      setErroUsername(true);
+    }
+  }
+
+  function isValidEmail(email) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  }
+
+  function isValidCPF(cpf) {
+    cpf = cpf.replace(/[^\d]+/g, "");
+
+    if (cpf.length !== 11) {
+      return false;
+    }
+
+    if (/^(\d)\1{10}$/.test(cpf)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function isValidTelefone(telefone) {
+    telefone = telefone.replace(/[^\d]+/g, "");
+    const regex = /^(\d{2})\d{9}$/;
+
+    return regex.test(telefone);
+  }
+
+  function handlecriarUsuario() {
+    setErroCpf(false);
+    setErroUsername(false);
+    setErroPasswd(false);
+    setErroTelefone(false);
+    setErroPnome(false);
+    if (
+      username === "" ||
+      passwd === "" ||
+      pnome === "" ||
+      telefone === "" ||
+      cpf === ""
+    ) {
+      if (username === "") {
+        setErroUsername(true);
+      }
+      if (passwd === "") {
+        setErroPasswd(true);
+      }
+      if (pnome === "") {
+        setErroPnome(true);
+      }
+      if (telefone === "") {
+        setErroTelefone(true);
+      }
+      if (cpf === "") {
+        setErroCpf(true);
+      }
+      alert("Por favor preencha todos os dados");
+    } else if (!isValidEmail(username)) {
+      setErroUsername(true);
+      alert("Insira um email válido");
+    } else if (!isValidCPF(cpf)) {
+      setErroCpf(true);
+      alert("Insira um cpf válido");
+    } else if (!isValidTelefone(telefone)) {
+      setErroTelefone(true);
+      alert("Insira um telefone válido");
+    } else {
+      criaUsuario();
     }
   }
 
@@ -59,15 +115,12 @@ function CriarConta({ handlecriarconta }) {
         <Row>
           <Col>
             <h2 className="txt">Crie sua conta</h2>
-            {/* <div>
-              <ImagemUsuario></ImagemUsuario>
-              <button>Escolher foto</button>
-            </div> */}
             <div>
               <TextField
                 required
                 variant="standard"
                 label="Nome Completo"
+                error={erroPnome}
                 value={pnome}
                 onChange={(event) => {
                   setPnome(event.target.value);
@@ -79,6 +132,7 @@ function CriarConta({ handlecriarconta }) {
                 required
                 variant="standard"
                 label="Senha"
+                error={erroPasswd}
                 value={passwd}
                 onChange={(event) => {
                   setPasswd(event.target.value);
@@ -90,6 +144,7 @@ function CriarConta({ handlecriarconta }) {
                 required
                 variant="standard"
                 label="Email"
+                error={erroUsername}
                 value={username}
                 onChange={(event) => {
                   setUsername(event.target.value);
@@ -102,6 +157,7 @@ function CriarConta({ handlecriarconta }) {
                 required
                 variant="standard"
                 label="Telefone"
+                error={erroTelefone}
                 value={telefone}
                 onChange={(event) => {
                   setTelefone(event.target.value);
@@ -113,6 +169,7 @@ function CriarConta({ handlecriarconta }) {
                 required
                 variant="standard"
                 label="CPF"
+                error={erroCpf}
                 value={cpf}
                 onChange={(event) => {
                   setCpf(event.target.value);
@@ -123,7 +180,7 @@ function CriarConta({ handlecriarconta }) {
               variant="contained"
               color="success"
               id="botao-criar-conta"
-              onClick={criaUsuario}
+              onClick={handlecriarUsuario}
             >
               Criar conta
             </Button>

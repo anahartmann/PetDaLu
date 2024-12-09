@@ -2,7 +2,8 @@ import "./Enderecos.css";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import AddIcon from "@mui/icons-material/Add";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   TextField,
@@ -13,33 +14,167 @@ import {
 } from "@mui/material";
 
 function Enderecos() {
-  const [enderecos, setEnderecos] = useState([
-    { id: 1, texto: "Rua Barão do Rio Branco, 66 - Centro" },
-    { id: 2, texto: "Av. Fernando Machado, 6784 - Centro " },
-    { id: 3, texto: "Rua José, 123 - Centro" },
-  ]);
+  const [enderecos, setEnderecos] = useState([]);
+
+  async function buscarEnderecos() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3010/enderecos", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setEnderecos(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar endereços:", error);
+    }
+  }
+
+  useEffect(() => {
+    buscarEnderecos();
+  }, []);
 
   const [openForm, setOpenForm] = useState(false);
-  const [novoEndereco, setNovoEndereco] = useState("");
+  const [num, setNum] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [errocidade, setErroCidade] = useState(false);
+  const [erronum, setErroNum] = useState(false);
+  const [errolog, setErroLog] = useState(false);
+
+  const [openFormAlterar, setOpenFormAlterar] = useState(false);
+  const [eid, setEid] = useState(0);
 
   const handleOpenForm = () => setOpenForm(true);
   const handleCloseForm = () => {
     setOpenForm(false);
-    setNovoEndereco("");
+    setCidade("");
+    setLogradouro("");
+    setNum("");
+    setErroCidade(false);
+    setErroLog(false);
+    setErroNum(false);
   };
 
-  const adicionarEndereco = () => {
-    if (novoEndereco.trim()) {
-      setEnderecos([
-        ...enderecos,
-        { id: enderecos.length + 1, texto: novoEndereco },
-      ]);
+  const handleOpenFormAlterar = async (eid, num, logradouro, cidade) => {
+    setOpenFormAlterar(true);
+
+    setEid(eid);
+    setCidade(cidade);
+    setNum(num);
+    setLogradouro(logradouro);
+  };
+  const handleCloseFormAlterar = () => {
+    setOpenFormAlterar(false);
+    setCidade("");
+    setLogradouro("");
+    setNum("");
+    setEid(0);
+    setErroCidade(false);
+    setErroLog(false);
+    setErroNum(false);
+  };
+
+  const handleAdicionarEndereco = async () => {
+    setErroCidade(false);
+    setErroLog(false);
+    setErroNum(false);
+    if (cidade === "" || logradouro === "" || num === "") {
+      if (cidade === "") {
+        setErroCidade(true);
+      }
+      if (logradouro === "") {
+        setErroLog(true);
+      }
+      if (num === "") {
+        setErroNum(true);
+      }
+      alert("Por favor preencha todos os campus");
+    } else if (isNaN(Number(num))) {
+      setErroNum(true);
+      alert("Por favor insira um número");
+    } else {
+      adicionarEndereco();
     }
-    handleCloseForm();
   };
 
-  const excluirEndereco = (id) => {
-    setEnderecos(enderecos.filter((endereco) => endereco.id !== id));
+  const handleAlterarEndereco = async () => {
+    setErroCidade(false);
+    setErroLog(false);
+    setErroNum(false);
+    if (cidade === "" || logradouro === "" || num === "") {
+      if (cidade === "") {
+        setErroCidade(true);
+      }
+      if (logradouro === "") {
+        setErroLog(true);
+      }
+      if (num === "") {
+        setErroNum(true);
+      }
+      alert("Por favor preencha todos os campus");
+    } else if (isNaN(Number(num))) {
+      setErroNum(true);
+      alert("Por favor insira um número");
+    } else {
+      alterarEndereco();
+    }
+  };
+
+  const adicionarEndereco = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:3010/criarendereco",
+        { num: num, logradouro: logradouro, cidade: cidade },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarEnderecos();
+      handleCloseForm();
+    } catch (error) {
+      console.error("Erro ao adicionar endereço:", error);
+    }
+  };
+
+  const alterarEndereco = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:3010/alterarendereco",
+        { num: num, logradouro: logradouro, cidade: cidade, eid: eid },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarEnderecos();
+      handleCloseFormAlterar();
+    } catch (error) {
+      console.error("Erro ao alterar endereço:", error);
+    }
+  };
+
+  const excluirEndereco = async (eid) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:3010/excluirendereco`,
+        { eid: eid },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarEnderecos();
+    } catch (error) {
+      console.error("Erro ao excluir endereço:", error);
+    }
   };
 
   return (
@@ -53,14 +188,23 @@ function Enderecos() {
         </Row>
 
         {enderecos.map((endereco) => (
-          <Row key={endereco.id} className="row_endereco">
-            <p className="txt_endereco">{endereco.texto}</p>
+          <Row key={endereco.eid} className="row_endereco">
+            <p className="txt_endereco">
+              {endereco.cidade}, {endereco.logradouro}, {endereco.num}
+            </p>
             <div className="actions">
               <Button
                 variant="text"
                 color="primary"
                 size="small"
-                onClick={() => alert(`Alterar ${endereco.texto}`)}
+                onClick={() =>
+                  handleOpenFormAlterar(
+                    endereco.eid,
+                    endereco.num,
+                    endereco.logradouro,
+                    endereco.cidade
+                  )
+                }
               >
                 Alterar
               </Button>
@@ -68,7 +212,7 @@ function Enderecos() {
                 variant="text"
                 color="secondary"
                 size="small"
-                onClick={() => excluirEndereco(endereco.id)}
+                onClick={() => excluirEndereco(endereco.eid)}
               >
                 Excluir
               </Button>
@@ -80,14 +224,41 @@ function Enderecos() {
           <DialogTitle>Adicionar novo endereço</DialogTitle>
           <DialogContent>
             <TextField
+              margin="dense"
+              label="Cidade"
+              type="text"
+              fullWidth
+              error={errocidade}
+              variant="outlined"
+              value={cidade}
+              onChange={(event) => {
+                setCidade(event.target.value);
+              }}
+            />
+            <TextField
+              margin="dense"
+              label="Logradouro"
+              type="text"
+              fullWidth
+              error={errolog}
+              variant="outlined"
+              value={logradouro}
+              onChange={(event) => {
+                setLogradouro(event.target.value);
+              }}
+            />{" "}
+            <TextField
               autoFocus
               margin="dense"
-              label="Novo endereço"
+              label="Número"
               type="text"
               fullWidth
               variant="outlined"
-              value={novoEndereco}
-              onChange={(e) => setNovoEndereco(e.target.value)}
+              error={erronum}
+              value={num}
+              onChange={(event) => {
+                setNum(event.target.value);
+              }}
             />
           </DialogContent>
           <DialogActions>
@@ -102,10 +273,71 @@ function Enderecos() {
             <Button
               variant="text"
               className="item"
-              onClick={adicionarEndereco}
+              onClick={handleAdicionarEndereco}
               sx={{ color: "#068146" }}
             >
               Adicionar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={openFormAlterar} onClose={handleCloseFormAlterar}>
+          <DialogTitle>Alterar endereço</DialogTitle>
+          <DialogContent>
+            <TextField
+              margin="dense"
+              label="Cidade"
+              type="text"
+              fullWidth
+              error={errocidade}
+              variant="outlined"
+              value={cidade}
+              onChange={(event) => {
+                setCidade(event.target.value);
+              }}
+            />
+            <TextField
+              margin="dense"
+              label="Logradouro"
+              type="text"
+              fullWidth
+              error={errolog}
+              variant="outlined"
+              value={logradouro}
+              onChange={(event) => {
+                setLogradouro(event.target.value);
+              }}
+            />{" "}
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Número"
+              type="text"
+              fullWidth
+              error={erronum}
+              variant="outlined"
+              value={num}
+              onChange={(event) => {
+                setNum(event.target.value);
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="text"
+              className="item"
+              onClick={handleCloseFormAlterar}
+              sx={{ color: "#068146" }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="text"
+              className="item"
+              onClick={handleAlterarEndereco}
+              sx={{ color: "#068146" }}
+            >
+              Alterar
             </Button>
           </DialogActions>
         </Dialog>

@@ -2,7 +2,8 @@ import "./AlterarTabelaPrecos.css";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import AddIcon from "@mui/icons-material/Add";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   TextField,
@@ -11,71 +12,211 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-function AlterarTabelaPrecos() {
-  const [servicos, setServicos] = useState([
-    {
-      id: 1,
-      descrServico: "Banho",
-      valor: 30,
-    },
-    {
-      id: 2,
-      descrServico: "Tosa Médio Porte",
-      valor: 40,
-    },
-    {
-      id: 3,
-      descrServico: "Banho + Tosa Médio Porte",
-      valor: 60,
-    },
-  ]);
+import { FormControl, Select, MenuItem, InputLabel } from "@mui/material";
+
+function AlterarTabelaPrecos({ userRole }) {
+  const [servicos, setServicos] = useState([]);
+
+  async function buscarServicos() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3010/servico", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setServicos(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar serviços:", error);
+    }
+  }
+
+  useEffect(() => {
+    buscarServicos();
+  }, []);
 
   const [openForm, setOpenForm] = useState(false);
-  const [registroAtual, setRegistroAtual] = useState(null);
+  const [preco, setPreco] = useState("");
+  const [sdescr, setSdescr] = useState("");
+  const [porte, setPorte] = useState("");
+  const [erropreco, setErroPreco] = useState(false);
+  const [errosdescr, setErroSdescr] = useState(false);
+  const [errosporte, setErroPorte] = useState(false);
+  const [sid, setSid] = useState("");
+  const [openFormAlterar, setOpenFormAlterar] = useState(false);
 
-  const handleOpenForm = (registro = { descrServico: "", valor: 0 }) => {
-    setRegistroAtual({ ...registro }); // Inicializa o formulário com dados ou vazio
-    setOpenForm(true);
-  };
+  const handleOpenForm = () => setOpenForm(true);
 
   const handleCloseForm = () => {
     setOpenForm(false);
-    setRegistroAtual(null);
+    setPreco("");
+    setSdescr("");
+    setSid("");
+    setPorte("");
+    setErroPorte(false);
+    setErroPreco(false);
+    setErroSdescr(false);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setRegistroAtual((prev) => ({
-      ...prev,
-      [name]: name === "valor" ? parseFloat(value) || 0 : value, // Garante que 'valor' seja numérico
-    }));
+  const handleOpenFormAlterar = async (sid, preco, sdescr, porte) => {
+    setOpenFormAlterar(true);
+    setPreco(preco);
+    setSdescr(sdescr);
+    setSid(sid);
+    setPorte(porte);
+  };
+  const handleCloseFormAlterar = () => {
+    setOpenFormAlterar(false);
+    setPreco("");
+    setSdescr("");
+    setSid("");
+    setPorte("");
+    setErroPorte(false);
+    setErroPreco(false);
+    setErroSdescr(false);
   };
 
-  const atualizarPagamento = () => {
-    if (registroAtual.id) {
-      // Editando um serviço existente
-      const servicosAtualizados = servicos.map((servico) =>
-        servico.id === registroAtual.id
-          ? { ...registroAtual } // Atualiza o serviço com os novos valores
-          : servico
-      );
-      setServicos(servicosAtualizados);
-    } else {
-      // Adicionando um novo serviço
-      const novoServico = {
-        ...registroAtual,
-        id:
-          servicos.length > 0 ? Math.max(...servicos.map((s) => s.id)) + 1 : 1, // Gera um novo ID
-      };
-      setServicos([...servicos, novoServico]);
+  const adicionarServico = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (sdescr === "Entrega/Retirada") {
+        await axios.post(
+          "http://localhost:3010/criarservico",
+          { preco: preco, sdescr: sdescr, porte: "-" },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        await axios.post(
+          "http://localhost:3010/criarservico",
+          { preco: preco, sdescr: sdescr, porte: porte },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+      buscarServicos();
+      handleCloseForm();
+    } catch (error) {
+      console.error("Erro ao adicionar serviço:", error);
     }
-    handleCloseForm();
   };
 
-  const excluirServico = (id) => {
-    setServicos(servicos.filter((servico) => servico.id !== id));
+  const alterarServico = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (sdescr === "Entrega/Retirada") {
+        await axios.post(
+          "http://localhost:3010/alterarservico",
+          { preco: preco, sdescr: sdescr, sid: sid, porte: "-" },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        await axios.post(
+          "http://localhost:3010/alterarservico",
+          { preco: preco, sdescr: sdescr, sid: sid, porte: porte },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+      buscarServicos();
+      handleCloseFormAlterar();
+    } catch (error) {
+      console.error("Erro ao alterar serviço:", error);
+    }
   };
+
+  const excluirServico = async (sid) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:3010/excluirservico`,
+        { sid: sid },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarServicos();
+    } catch (error) {
+      console.error("Erro ao excluir serviço:", error);
+    }
+  };
+
+  function handleadicionarServico() {
+    setErroPreco(false);
+    setErroSdescr(false);
+    setErroPorte(false);
+    if (
+      sdescr === "" ||
+      preco === "" ||
+      (sdescr !== "Entrega/Retirada" && porte === "")
+    ) {
+      alert("Por favor preencha todos os campos");
+      if (sdescr === "") {
+        setErroSdescr(true);
+      }
+      if (preco === "") {
+        setErroPreco(true);
+      }
+
+      if (sdescr !== "Entrega/Retirada" && porte === "") {
+        setErroPorte(true);
+      }
+    } else if (isNaN(Number(preco))) {
+      setErroPreco(true);
+      alert("Por favor insira um número");
+    } else {
+      adicionarServico();
+    }
+  }
+
+  function handlealterarServico() {
+    setErroPreco(false);
+    setErroSdescr(false);
+    setErroPorte(false);
+    if (
+      sdescr === "" ||
+      preco === "" ||
+      (sdescr !== "Entrega/Retirada" && porte === "")
+    ) {
+      alert("Por favor preencha todos os campos");
+      if (sdescr === "") {
+        setErroSdescr(true);
+      }
+      if (preco === "") {
+        setErroPreco(true);
+      }
+
+      if (sdescr !== "Entrega/Retirada" && porte === "") {
+        setErroPorte(true);
+      }
+    } else if (isNaN(Number(preco))) {
+      setErroPreco(true);
+      alert("Por favor insira um número");
+    } else {
+      alterarServico();
+    }
+  }
+
+  const tipodeservico = ["Banho", "Tosa", "Banho + Tosa", "Entrega/Retirada"];
+  const tipoPorte = ["Grande", "Médio", "Pequeno"];
 
   return (
     <div id="tabela-clientes">
@@ -94,62 +235,105 @@ function AlterarTabelaPrecos() {
           <thead>
             <tr>
               <th>Serviço</th>
+              <th>Porte</th>
               <th>Valor</th>
-              <th colSpan={2}>Ações</th>
+              {userRole ? <th colSpan={2}>Ações</th> : <div></div>}
             </tr>
           </thead>
           <tbody>
             {servicos.map((servico) => (
-              <tr key={servico.id}>
-                <td>{servico.descrServico}</td>
-                <td>R$ {servico.valor}</td>
-                <td>
-                  <Button
-                    variant="text"
-                    sx={{ color: "#068146" }}
-                    size="small"
-                    onClick={() => handleOpenForm(servico)}
-                  >
-                    Alterar
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="text"
-                    sx={{ color: "#068146" }}
-                    size="small"
-                    onClick={() => excluirServico(servico.id)}
-                  >
-                    Excluir
-                  </Button>
-                </td>
+              <tr key={servico.sid}>
+                <td>{servico.sdescr}</td>
+                <td>{servico.porte}</td>
+                <td>R$ {servico.preco}</td>
+                {userRole ? (
+                  <div>
+                    <td>
+                      <Button
+                        variant="text"
+                        sx={{ color: "#068146" }}
+                        size="small"
+                        onClick={() =>
+                          handleOpenFormAlterar(
+                            servico.sid,
+                            servico.preco,
+                            servico.sdescr,
+                            servico.porte
+                          )
+                        }
+                      >
+                        <EditIcon></EditIcon>
+                      </Button>
+                    </td>
+                    <td>
+                      <Button
+                        variant="text"
+                        sx={{ color: "#068146" }}
+                        size="small"
+                        onClick={() => excluirServico(servico.sid)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </Button>
+                    </td>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
 
         <Dialog open={openForm} onClose={handleCloseForm}>
-          <DialogTitle>
-            {registroAtual?.id ? "Editar Serviço" : "Novo Serviço"}
-          </DialogTitle>
+          <DialogTitle>Adicionar novo serviço</DialogTitle>
           <DialogContent>
-            <TextField
-              margin="dense"
-              label="Serviço"
-              name="descrServico"
-              value={registroAtual ? registroAtual.descrServico : ""}
-              onChange={handleChange}
-              fullWidth
-              variant="outlined"
-            />
-
+            <FormControl fullWidth>
+              <InputLabel id="servico-label">
+                Selecione tipo de serviço
+              </InputLabel>
+              <Select
+                labelId="servico-label"
+                value={sdescr}
+                error={errosdescr}
+                onChange={(e) => setSdescr(e.target.value)}
+              >
+                {tipodeservico.map((tipo, index) => (
+                  <MenuItem key={index} value={tipo}>
+                    {tipo}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {sdescr !== "Entrega/Retirada" && sdescr !== "" ? (
+              <FormControl fullWidth>
+                <InputLabel id="porte-label">
+                  Selecione o porte do pet
+                </InputLabel>
+                <Select
+                  labelId="porte-label"
+                  value={porte}
+                  error={errosporte}
+                  onChange={(e) => setPorte(e.target.value)}
+                >
+                  {tipoPorte.map((tipo, index) => (
+                    <MenuItem key={index} value={tipo}>
+                      {tipo}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <div></div>
+            )}
             <TextField
               margin="dense"
               label="Valor"
               name="valor"
-              type="number"
-              value={registroAtual ? registroAtual.valor : ""}
-              onChange={handleChange}
+              value={preco}
+              error={erropreco}
+              onChange={(event) => {
+                setPreco(event.target.value);
+              }}
               fullWidth
               variant="outlined"
             />
@@ -164,10 +348,83 @@ function AlterarTabelaPrecos() {
             </Button>
             <Button
               variant="text"
-              onClick={atualizarPagamento}
+              onClick={handleadicionarServico}
               sx={{ color: "#068146" }}
             >
-              {registroAtual?.id ? "Atualizar" : "Adicionar"}
+              Adicionar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={openFormAlterar} onClose={handleCloseFormAlterar}>
+          <DialogTitle>Alterar serviço</DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth>
+              <InputLabel id="servico-label">
+                Selecione tipo de serviço
+              </InputLabel>
+              <Select
+                labelId="servico-label"
+                value={sdescr}
+                error={errosdescr}
+                onChange={(e) => setSdescr(e.target.value)}
+              >
+                {tipodeservico.map((tipo, index) => (
+                  <MenuItem key={index} value={tipo}>
+                    {tipo}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {sdescr !== "Entrega/Retirada" && sdescr !== "" ? (
+              <FormControl fullWidth>
+                <InputLabel id="porte-label">
+                  Selecione o porte do pet
+                </InputLabel>
+                <Select
+                  labelId="porte-label"
+                  value={porte}
+                  error={errosporte}
+                  onChange={(e) => setPorte(e.target.value)}
+                >
+                  {tipoPorte.map((tipo, index) => (
+                    <MenuItem key={index} value={tipo}>
+                      {tipo}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <div></div>
+            )}
+
+            <TextField
+              margin="dense"
+              label="Valor"
+              name="valor"
+              error={erropreco}
+              value={preco}
+              onChange={(event) => {
+                setPreco(event.target.value);
+              }}
+              fullWidth
+              variant="outlined"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="text"
+              onClick={handleCloseFormAlterar}
+              sx={{ color: "#068146" }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="text"
+              onClick={handlealterarServico}
+              sx={{ color: "#068146" }}
+            >
+              Alterar
             </Button>
           </DialogActions>
         </Dialog>

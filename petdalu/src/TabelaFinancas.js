@@ -1,7 +1,8 @@
 import "./TabelaFinancas.css";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   Checkbox,
@@ -12,88 +13,124 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-//formatar a data no formato brasileiro (so pra mostrar na tabela)
-const formatarDataBrasileira = (data) => {
-  if (!data) return "";
-  const partes = data.split("-");
-  return `${partes[2]}/${partes[1]}/${partes[0]}`;
-};
-
 function TabelaFinancas() {
-  const [clientes, setClientes] = useState([
-    {
-      id: 1,
-      nomeCliente: "Ana",
-      nomePet: "Pimenta",
-      dataServico: "2024-11-11",
-      valor: 150,
-      pago: true,
-    },
-    {
-      id: 2,
-      nomeCliente: "Maria",
-      nomePet: "Iris",
-      dataServico: "2024-11-16",
-      valor: 100,
-      pago: false,
-    },
-    {
-      id: 3,
-      nomeCliente: "Alex",
-      nomePet: "Café",
-      dataServico: "2024-11-17",
-      valor: 200,
-      pago: false,
-    },
-  ]);
+  const formatarDataBrasileira = (data) => {
+    if (!data) return "";
+    const partes = data.split("-");
+    const p3 = partes[2].split("T");
+    return `${p3[0]}/${partes[1]}/${partes[0]}`;
+  };
 
-  const [openForm, setOpenForm] = useState(false);
+  const formatarData = (data) => {
+    const p = data.split("T");
+    return p[0];
+  };
+
+  const [clientes, setClientes] = useState([]);
   const [registroAtual, setRegistroAtual] = useState(null);
 
   const [filtroPeriodo, setFiltroPeriodo] = useState({ inicio: "", fim: "" });
   const [filtroPagamento, setFiltroPagamento] = useState("todos");
 
-  const handleOpenForm = (registro) => {
-    setRegistroAtual(registro);
-    setOpenForm(true);
+  const [financas, setfinancas] = useState([]);
+
+  async function buscarfinancass() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3010/financas", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setfinancas(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar finanças:", error);
+    }
+  }
+
+  useEffect(() => {
+    buscarfinancass();
+  }, []);
+
+  const [openForm, setOpenForm] = useState(false);
+  const [openFormAlterar, setOpenFormAlterar] = useState(false);
+  const [hid, setHid] = useState("");
+  const [pnome, setPnome] = useState("");
+  const [anome, setAnome] = useState("");
+  const [data, setData] = useState("");
+  const [pago, setPago] = useState("");
+  const [preco, setPreco] = useState("");
+
+  const handleOpenFormAlterar = async (
+    hid,
+    anome,
+    pnome,
+    data,
+    pago,
+    preco
+  ) => {
+    setOpenFormAlterar(true);
+
+    setHid(hid);
+    setAnome(anome);
+    setPnome(pnome);
+    setData(data);
+    setPago(pago);
+    setPreco(preco);
+  };
+  const handleCloseFormAlterar = () => {
+    setOpenFormAlterar(false);
+    setHid("");
+    setAnome("");
+    setPnome("");
+    setData("");
+    setPago("");
+    setPreco("");
   };
 
-  const handleCloseForm = () => {
-    setOpenForm(false);
-    setRegistroAtual(null);
+  const alterarfinancas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:3010/alterarfinanca",
+        { pago: pago, hid: hid, data: data },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      buscarfinancass();
+      handleCloseFormAlterar();
+    } catch (error) {
+      console.error("Erro ao alterar finança:", error);
+    }
   };
 
-  const atualizarPagamento = () => {
-    const clientesAtualizados = clientes.map((cliente) =>
-      cliente.id === registroAtual.id
-        ? { ...cliente, pago: registroAtual.pago }
-        : cliente
-    );
-    setClientes(clientesAtualizados);
-    handleCloseForm();
+  const handleCheck = async (feito) => {
+    if (feito === "s") {
+      setPago("n");
+    } else {
+      setPago("s");
+    }
   };
 
-  const handleCheckChange = (e) => {
-    setRegistroAtual({ ...registroAtual, pago: e.target.checked });
-  };
-
-  //filtrar os clientes
   const filtrarClientes = () => {
-    return clientes.filter((cliente) => {
-      //filtrar por pagamento
-      if (filtroPagamento === "pendente" && cliente.pago) return false;
-      if (filtroPagamento === "pago" && !cliente.pago) return false;
+    return financas.filter((cliente) => {
+      if (filtroPagamento === "pendente" && cliente.pago === "s") return false;
+      if (filtroPagamento === "pago" && cliente.pago === "n") return false;
 
-      //filtrar por periodo
+      const dataServico = new Date(formatarData(cliente.data));
+
       if (
         filtroPeriodo.inicio &&
-        new Date(cliente.dataServico) < new Date(filtroPeriodo.inicio)
+        new Date(formatarData(cliente.data)) < new Date(filtroPeriodo.inicio)
       ) {
         return false;
       }
       if (
         filtroPeriodo.fim &&
-        new Date(cliente.dataServico) > new Date(filtroPeriodo.fim)
+        new Date(formatarData(cliente.data)) > new Date(filtroPeriodo.fim)
       ) {
         return false;
       }
@@ -157,15 +194,24 @@ function TabelaFinancas() {
           </thead>
           <tbody>
             {clientesFiltrados.map((cliente) => (
-              <tr key={cliente.id}>
-                <td>{cliente.nomeCliente}</td>
-                <td>{cliente.nomePet}</td>
-                <td>{formatarDataBrasileira(cliente.dataServico)}</td>
-                <td>R$ {cliente.valor}</td>
+              <tr key={`${cliente.hid} ${cliente.data}`}>
+                <td>{cliente.pnome}</td>
+                <td>{cliente.anome}</td>
+                <td>{formatarDataBrasileira(cliente.data)}</td>
+                <td>R$ {cliente.preco}</td>
                 <td>
                   <Checkbox
-                    checked={cliente.pago}
-                    onChange={() => handleOpenForm(cliente)}
+                    checked={cliente.pago === "s"}
+                    onChange={() =>
+                      handleOpenFormAlterar(
+                        cliente.hid,
+                        cliente.anome,
+                        cliente.pnome,
+                        cliente.data,
+                        cliente.pago,
+                        cliente.preco
+                      )
+                    }
                     color="default"
                     sx={{
                       color: "#068146",
@@ -180,13 +226,13 @@ function TabelaFinancas() {
           </tbody>
         </table>
 
-        <Dialog open={openForm} onClose={handleCloseForm}>
+        <Dialog open={openFormAlterar} onClose={handleCloseFormAlterar}>
           <DialogTitle>Alterar Pagamento</DialogTitle>
           <DialogContent>
             <TextField
               margin="dense"
               label="Cliente"
-              value={registroAtual ? registroAtual.nomeCliente : ""}
+              value={pnome}
               fullWidth
               variant="outlined"
               disabled
@@ -194,7 +240,7 @@ function TabelaFinancas() {
             <TextField
               margin="dense"
               label="Pet"
-              value={registroAtual ? registroAtual.nomePet : ""}
+              value={anome}
               fullWidth
               variant="outlined"
               disabled
@@ -202,11 +248,7 @@ function TabelaFinancas() {
             <TextField
               margin="dense"
               label="Data do Serviço"
-              value={
-                registroAtual
-                  ? formatarDataBrasileira(registroAtual.dataServico)
-                  : ""
-              }
+              value={formatarDataBrasileira(data)}
               fullWidth
               variant="outlined"
               disabled
@@ -214,15 +256,15 @@ function TabelaFinancas() {
             <TextField
               margin="dense"
               label="Valor"
-              value={registroAtual ? `R$ ${registroAtual.valor}` : ""}
+              value={preco}
               fullWidth
               variant="outlined"
               disabled
             />
             <div className="checkbox-container">
               <Checkbox
-                checked={registroAtual ? registroAtual.pago : false}
-                onChange={handleCheckChange}
+                checked={pago === "s"}
+                onClick={() => handleCheck(pago)}
                 sx={{ color: "#068146" }}
               />
               <label>Pago</label>
@@ -232,7 +274,7 @@ function TabelaFinancas() {
             <Button
               variant="text"
               className="item"
-              onClick={handleCloseForm}
+              onClick={handleCloseFormAlterar}
               sx={{ color: "#068146" }}
             >
               Cancelar
@@ -240,7 +282,7 @@ function TabelaFinancas() {
             <Button
               variant="text"
               className="item"
-              onClick={atualizarPagamento}
+              onClick={alterarfinancas}
               sx={{ color: "#068146" }}
             >
               Atualizar
@@ -251,5 +293,4 @@ function TabelaFinancas() {
     </div>
   );
 }
-
 export default TabelaFinancas;

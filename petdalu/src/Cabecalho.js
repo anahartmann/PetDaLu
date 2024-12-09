@@ -2,9 +2,9 @@ import "./Cabecalho.css";
 import React from "react";
 import Titulo from "./Titulo";
 import ImagemUsuario from "./ImagemUsuario";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 
-function Cabecalho({ controlaClique }) {
+function Cabecalho({ controlaClique, userRole, isLoggedIn }) {
   return (
     <div id="faixa">
       <div id="logo">
@@ -32,38 +32,48 @@ function Cabecalho({ controlaClique }) {
         >
           Endereços
         </Button>
-
-        <Button
-          id="anotacoes"
-          variant="link"
-          className="item"
-          onClick={(event) => {
-            controlaClique(event.target.id);
-          }}
-        >
-          Anotações
-        </Button>
-        <Button
-          id="financas"
-          variant="link"
-          className="item"
-          onClick={(event) => {
-            controlaClique(event.target.id);
-          }}
-        >
-          Finanças
-        </Button>
-        <Button
-          id="tabelapreco"
-          variant="link"
-          className="item"
-          onClick={(event) => {
-            controlaClique(event.target.id);
-          }}
-        >
-          Tabela de Preços
-        </Button>
-
+        {userRole && isLoggedIn ? (
+          <Button
+            id="anotacoes"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Anotações
+          </Button>
+        ) : (
+          <div></div>
+        )}
+        {userRole && isLoggedIn ? (
+          <Button
+            id="financas"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Finanças
+          </Button>
+        ) : (
+          <div></div>
+        )}
+        {/*   {userRole && isLoggedIn ? (
+          <Button
+            id="tabelapreco"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Tabela de Preços
+          </Button>
+        ) : (
+          <div></div>
+        )} */}
         <Button
           id="animais"
           variant="link"
@@ -74,18 +84,34 @@ function Cabecalho({ controlaClique }) {
         >
           Animais
         </Button>
-
-        <Button
-          id="cadhorario"
-          variant="link"
-          className="item"
-          onClick={(event) => {
-            controlaClique(event.target.id);
-          }}
-        >
-          Cadastro Agenda
-        </Button>
-
+        {userRole && isLoggedIn ? (
+          <Button
+            id="cadhorario"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Cadastro Agenda
+          </Button>
+        ) : (
+          <div></div>
+        )}
+        {!userRole && isLoggedIn ? (
+          <Button
+            id="historico"
+            variant="link"
+            className="item"
+            onClick={(event) => {
+              controlaClique(event.target.id);
+            }}
+          >
+            Historico
+          </Button>
+        ) : (
+          <div></div>
+        )}
         <Button
           id="conta"
           className="item"
@@ -94,16 +120,6 @@ function Cabecalho({ controlaClique }) {
             controlaClique(event.target.id);
           }}
         >
-          <Button
-            id="agendaADM"
-            variant="link"
-            className="item"
-            onClick={(event) => {
-              controlaClique(event.target.id);
-            }}
-          >
-            AgendaADM
-          </Button>
           <ImagemUsuario />
         </Button>
       </div>
