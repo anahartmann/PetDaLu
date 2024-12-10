@@ -8,7 +8,7 @@ Ana: 2311100039 Sophia: 2311100008
 
 Na pasta PetdaLu se encontra o código do projeto feito em react.
 
-Na pasta Projeto está o documento com o projeto do site, contendo os requsitos funcionais, não funcionais, motivação, protótipos e casos de teste. Também na pasta se encontra os modelos conceitual e lógico relacional do banco de dados.
+Na pasta Projeto está o documento com o projeto do site, contendo os requsitos funcionais, não funcionais, motivação, protótipos e casos de teste. Também na pasta se encontra os modelos conceitual, lógico relacional e fisíco do banco de dados.
 
 O seguinte trabalho tem por objetivo contruir uma plataforma que permita que os clientes do Pet Shop da Lu possam acessar e agendar horários para os serviços de forma autônoma. Terá uma interface que forneça às funcionárias uma visão clara dos horários marcados, garantindo o controle eficiente das atividades e evitando confusões ou sobreposições de compromissos.
 
